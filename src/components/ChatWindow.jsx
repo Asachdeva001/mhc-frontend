@@ -63,7 +63,7 @@ export default function ChatWindow({ messages = [], onSend, isLoading = false })
         {messages.length === 0 ? (
           <div className="text-center text-gray-500 mt-8">
             <div className="text-4xl mb-4">💬</div>
-            <p>Start a conversation with Mental Buddy!</p>
+            <p>Start a conversation with Mental Health Buddy!</p>
             <p className="text-sm mt-2">I&apos;m here to help with your mental wellness journey.</p>
           </div>
         ) : (
@@ -100,7 +100,7 @@ export default function ChatWindow({ messages = [], onSend, isLoading = false })
                   <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
                   <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                 </div>
-                <span className="text-sm">Mental Buddy is typing...</span>
+                <span className="text-sm">Mental Health Buddy is typing...</span>
               </div>
             </div>
           </div>

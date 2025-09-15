@@ -12,7 +12,7 @@ export default function ChatPage() {
   const { user, isAuthenticated, loading } = useAuth();
   const [messages, setMessages] = useState([
     {
-      text: "Hello! I'm Mental Buddy, your AI wellness companion. How are you feeling today?",
+      text: "Hello! I'm Mental Health Buddy, your AI wellness companion. How are you feeling today?",
       sender: 'ai',
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }
