@@ -104,7 +104,7 @@ export default function ChatPage() {
               <h3 className="font-semibold text-gray-800 mb-3">Quick Actions</h3>
               <div className="space-y-2">
                 <button
-                  onClick={() => handleSend("I&apos;m feeling anxious")}
+                  onClick={() => handleSend("I'm feeling anxious")}
                   className="w-full text-left px-3 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors"
                 >
                   😰 I&apos;m feeling anxious
