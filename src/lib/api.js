@@ -120,14 +120,51 @@ export const api = {
   // Activities endpoints
   activities: {
     getTodayActivities: async () => {
-      return apiCall('/api/activities/today');
+      // Use custom local activities for now (no backend call)
+      const allActivities = [
+        {
+          id: 'breathing-exercise',
+          title: '5-Minute Breathing Exercise',
+          description: 'Practice deep breathing to reduce stress and anxiety',
+          duration: '5 minutes',
+          category: 'Mindfulness',
+          difficulty: 'Easy',
+          completed: false,
+        },
+        {
+          id: 'gratitude-journal',
+          title: 'Gratitude Journaling',
+          description: 'Write down three things you are grateful for today',
+          duration: '10 minutes',
+          category: 'Reflection',
+          difficulty: 'Easy',
+          completed: false,
+        },
+        {
+          id: 'walk-outside',
+          title: 'Take a Walk Outside',
+          description: 'Get some fresh air and gentle movement',
+          duration: '15 minutes',
+          category: 'Physical',
+          difficulty: 'Easy',
+          completed: false,
+        },
+        {
+          id: 'guided-meditation',
+          title: 'Guided Meditation',
+          description: 'Listen to a calming meditation session',
+          duration: '10 minutes',
+          category: 'Mindfulness',
+          difficulty: 'Medium',
+          completed: false,
+        },
+      ];
+      return allActivities;
     },
     
     completeActivity: async (activityId, notes = '') => {
-      return apiCall('/api/activities/complete', {
-        method: 'POST',
-        body: JSON.stringify({ activityId, notes }),
-      });
+      // Mock completion success without hitting backend
+      return { success: true, activityId, notes };
     },
     
     getActivityHistory: async (days = 7) => {
