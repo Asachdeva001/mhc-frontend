@@ -12,7 +12,7 @@ export default function ChatPage() {
   const { user, isAuthenticated, loading } = useAuth();
   const [messages, setMessages] = useState([
     {
-      text: "Hello! I&apos;m Mental Buddy, your AI wellness companion. How are you feeling today?",
+      text: "Hello! I'm Mental Buddy, your AI wellness companion. How are you feeling today?",
       sender: 'ai',
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }
@@ -59,7 +59,7 @@ export default function ChatPage() {
       
       // Fallback response if API fails
       const fallbackResponse = {
-        text: "I&apos;m sorry, I&apos;m having trouble connecting right now. Please try again in a moment.",
+        text: "I'm sorry, I'm having trouble connecting right now. Please try again in a moment.",
         sender: 'ai',
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
