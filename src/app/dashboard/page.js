@@ -223,7 +223,7 @@ export default function DashboardPage() {
                 <div className="text-sm text-gray-600">
                   Mood: {todayMood.moodEntry.mood}/10
                   {todayMood.moodEntry.note && (
-                    <div className="mt-1 italic">"{todayMood.moodEntry.note}"</div>
+                    <div className="mt-1 italic">&quot;{todayMood.moodEntry.note}&quot;</div>
                   )}
                 </div>
                 <button
