@@ -1,147 +1,110 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { SendHorizonal, Bot } from 'lucide-react';
 
-export default function ChatWindow({ messages = [], onSend, isLoading = false }) {
-  const [inputMessage, setInputMessage] = useState('');
-  const [showScrollButton, setShowScrollButton] = useState(false);
+export default function ChatWindow({ messages = [], onSend, isAiTyping }) {
+  const [inputText, setInputText] = useState('');
   const messagesEndRef = useRef(null);
-  const messagesContainerRef = useRef(null);
 
-  // Auto-scroll to bottom when new messages arrive
+  // Effect to auto-scroll to the bottom on new messages
   useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ 
-        behavior: 'smooth',
-        block: 'end'
-      });
-    }
-  }, [messages]);
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, isAiTyping]);
 
-  // Handle scroll events to show/hide scroll button
-  const handleScroll = () => {
-    if (messagesContainerRef.current) {
-      const { scrollTop, scrollHeight, clientHeight } = messagesContainerRef.current;
-      const isNearBottom = scrollHeight - scrollTop - clientHeight < 100;
-      setShowScrollButton(!isNearBottom);
-    }
-  };
-
-  // Scroll to bottom function
-  const scrollToBottom = () => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ 
-        behavior: 'smooth',
-        block: 'end'
-      });
-    }
-  };
-
-  const handleSend = () => {
-    if (inputMessage.trim() && onSend) {
-      onSend(inputMessage.trim());
-      setInputMessage('');
-    }
-  };
-
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
+  const handleSendMessage = (e) => {
+    e.preventDefault();
+    if (inputText.trim()) {
+      onSend(inputText.trim());
+      setInputText('');
     }
   };
 
   return (
-    <div className="flex flex-col h-full bg-white rounded-lg shadow-lg">
-      {/* Messages Container - Fixed height with scroll */}
-      <div 
-        ref={messagesContainerRef}
-        onScroll={handleScroll}
-        className="flex-1 overflow-y-auto p-4 space-y-4 min-h-0 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hover:scrollbar-thumb-gray-400 relative" 
-        style={{ maxHeight: 'calc(100vh - 200px)' }}
-      >
-        {messages.length === 0 ? (
-          <div className="text-center text-gray-500 mt-8">
-            <div className="text-4xl mb-4">💬</div>
-            <p>Start a conversation with Mental Health Buddy!</p>
-            <p className="text-sm mt-2">I&apos;m here to help with your mental wellness journey.</p>
-          </div>
-        ) : (
-          messages.map((message, index) => (
-            <div
-              key={index}
-              className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-            >
-              <div
-                className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                  message.sender === 'user'
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-gray-100 text-gray-800'
-                }`}
-              >
-                <p className="text-sm">{message.text}</p>
-                <p className={`text-xs mt-1 ${
-                  message.sender === 'user' ? 'text-blue-100' : 'text-gray-500'
-                }`}>
-                  {message.timestamp}
-                </p>
-              </div>
-            </div>
-          ))
-        )}
-        
-        {/* Loading indicator */}
-        {isLoading && (
-          <div className="flex justify-start">
-            <div className="max-w-xs lg:max-w-md px-4 py-2 rounded-lg bg-gray-100 text-gray-800">
-              <div className="flex items-center space-x-2">
-                <div className="flex space-x-1">
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                </div>
-                <span className="text-sm">Mental Health Buddy is typing...</span>
-              </div>
-            </div>
-          </div>
-        )}
-        
-        <div ref={messagesEndRef} />
-        
-        {/* Scroll to bottom button */}
-        {showScrollButton && (
-          <button
-            onClick={scrollToBottom}
-            className="absolute bottom-4 right-4 bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-full shadow-lg transition-all duration-200 z-10"
-            title="Scroll to bottom"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-            </svg>
-          </button>
-        )}
+    <div className="flex flex-col h-full bg-white/60 backdrop-blur-lg rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
+      {/* Message Display Area */}
+      <div className="flex-1 p-6 overflow-y-auto">
+        <motion.div
+            className="space-y-4"
+            variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
+            initial="hidden"
+            animate="visible"
+        >
+          {messages.map((msg, index) => (
+            <MessageBubble key={index} message={msg} />
+          ))}
+          <AnimatePresence>
+            {isAiTyping && <TypingIndicator />}
+          </AnimatePresence>
+          <div ref={messagesEndRef} />
+        </motion.div>
       </div>
 
-      {/* Input Area - Fixed at bottom */}
-      <div className="border-t p-4 flex-shrink-0 bg-white">
-        <div className="flex space-x-2">
+      {/* Input Form Area */}
+      <div className="p-4 border-t border-slate-200/80">
+        <form onSubmit={handleSendMessage} className="flex items-center space-x-3">
           <input
             type="text"
-            value={inputMessage}
-            onChange={(e) => setInputMessage(e.target.value)}
-            onKeyPress={handleKeyPress}
-            placeholder="Type your message..."
-            className="flex-1 px-4 py-2 border text-gray-700 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            value={inputText}
+            onChange={(e) => setInputText(e.target.value)}
+            placeholder="Type your message here..."
+            className="flex-1 w-full px-4 py-2 bg-slate-100 border border-transparent rounded-full focus:outline-none focus:ring-2 focus:ring-teal-500 transition"
+            disabled={isAiTyping}
           />
           <button
-            onClick={handleSend}
-            disabled={!inputMessage.trim() || isLoading}
-            className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+            type="submit"
+            disabled={isAiTyping || !inputText.trim()}
+            className="p-2 bg-teal-600 text-white rounded-full transition-colors transform hover:scale-110 disabled:bg-slate-300 disabled:scale-100"
           >
-            {isLoading ? 'Sending...' : 'Send'}
+            <SendHorizonal size={20} />
           </button>
-        </div>
+        </form>
       </div>
     </div>
   );
 }
+
+// --- Child Components for ChatWindow ---
+const MessageBubble = ({ message }) => {
+  const isUser = message.sender === 'user';
+  return (
+    <motion.div
+        variants={{ hidden: { y: 20, opacity: 0 }, visible: { y: 0, opacity: 1 } }}
+        className={`flex items-end gap-2 ${isUser ? 'justify-end' : 'justify-start'}`}
+    >
+      {!isUser && (
+        <div className="w-8 h-8 rounded-full bg-teal-100 flex items-center justify-center flex-shrink-0">
+          <Bot size={18} className="text-teal-700"/>
+        </div>
+      )}
+      <div
+        className={`max-w-md px-4 py-2 rounded-2xl ${
+          isUser
+            ? 'bg-teal-600 text-white rounded-br-lg'
+            : 'bg-slate-100 text-slate-800 rounded-bl-lg'
+        }`}
+      >
+        <p className="text-sm whitespace-pre-wrap">{message.text}</p>
+      </div>
+    </motion.div>
+  );
+};
+
+const TypingIndicator = () => (
+    <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: 10 }}
+        className="flex items-end gap-2"
+    >
+        <div className="w-8 h-8 rounded-full bg-teal-100 flex items-center justify-center flex-shrink-0">
+          <Bot size={18} className="text-teal-700"/>
+        </div>
+        <div className="px-4 py-3 rounded-2xl rounded-bl-lg bg-slate-100 flex items-center space-x-1.5">
+            <span className="h-1.5 w-1.5 bg-slate-400 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+            <span className="h-1.5 w-1.5 bg-slate-400 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+            <span className="h-1.5 w-1.5 bg-slate-400 rounded-full animate-bounce"></span>
+        </div>
+    </motion.div>
+);

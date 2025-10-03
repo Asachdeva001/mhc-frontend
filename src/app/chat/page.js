@@ -2,23 +2,37 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { motion } from 'framer-motion';
 import ChatWindow from '../../components/ChatWindow';
 import Navigation from '../../components/Navigation';
 import { useAuth } from '../../lib/authContext';
 import { api } from '../../lib/api';
+import { Loader2, Feather, HeartPulse, BrainCircuit, Phone, BookOpen } from 'lucide-react';
+
+const mindfulQuotes = [
+  "The present moment is filled with joy and happiness. If you are attentive, you will see it.",
+  "Feelings are much like waves, we can't stop them from coming but we can choose which one to surf.",
+  "You don't have to control your thoughts. You just have to stop letting them control you.",
+  "The best way to capture moments is to pay attention. This is how we cultivate mindfulness."
+];
 
 export default function ChatPage() {
   const router = useRouter();
   const { user, isAuthenticated, loading } = useAuth();
-  const [messages, setMessages] = useState([
-    {
-      text: "Hello! I'm Mental Health Buddy, your AI wellness companion. How are you feeling today?",
-      sender: 'ai',
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    }
-  ]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [conversationHistory, setConversationHistory] = useState([]);
+  const [messages, setMessages] = useState([]);
+  const [isAiTyping, setIsAiTyping] = useState(false);
+  const [dailyQuote] = useState(() => mindfulQuotes[Math.floor(Math.random() * mindfulQuotes.length)]);
+
+  // Effect to set the initial welcome message only once
+  useEffect(() => {
+    setMessages([
+      {
+        text: `Hello ${user?.name?.split(' ')[0] || 'there'}! I'm Buddy, your AI wellness companion. What's on your mind today?`,
+        sender: 'ai',
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      }
+    ]);
+  }, [user]); // Reruns only if the user object changes
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -27,24 +41,22 @@ export default function ChatPage() {
   }, [isAuthenticated, loading, router]);
 
   const handleSend = async (messageText) => {
-    // Add user message
     const userMessage = {
       text: messageText,
       sender: 'user',
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
 
-    setMessages(prev => [...prev, userMessage]);
-    setIsLoading(true);
+    const newMessages = [...messages, userMessage];
+    setMessages(newMessages);
+    setIsAiTyping(true);
 
     try {
-      // Convert messages to the format expected by the API
-      const apiMessages = messages.map(msg => ({
+      const apiMessages = newMessages.map(msg => ({
         role: msg.sender === 'ai' ? 'assistant' : 'user',
         content: msg.text
       }));
 
-      // Get AI response from backend
       const response = await api.generateResponse(messageText, apiMessages, null, user?.uid);
       
       const aiResponse = {
@@ -57,84 +69,85 @@ export default function ChatPage() {
     } catch (error) {
       console.error('Error getting AI response:', error);
       
-      // Fallback response if API fails
       const fallbackResponse = {
-        text: "I'm sorry, I'm having trouble connecting right now. Please try again in a moment.",
+        text: "I'm sorry, I'm having trouble connecting right now. Please check your connection and try again.",
         sender: 'ai',
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
 
       setMessages(prev => [...prev, fallbackResponse]);
     } finally {
-      setIsLoading(false);
+      setIsAiTyping(false);
     }
   };
 
-  if (loading) {
+  if (loading || !isAuthenticated || !user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-2xl font-semibold text-gray-800 mb-2">Loading...</div>
-          <div className="text-gray-600">Please wait while we authenticate you</div>
-        </div>
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <Loader2 className="animate-spin h-8 w-8 text-teal-600" />
       </div>
     );
   }
 
-  if (!isAuthenticated || !user) {
-    return null; // Will redirect to signin
-  }
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
+    <div className="flex flex-col h-screen bg-gradient-to-br from-emerald-50 via-slate-50 to-sky-50">
       <Navigation currentPage="chat" />
-
-      {/* Chat Interface */}
-      <div className="max-w-6xl mx-auto p-4">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6" style={{ height: 'calc(100vh - 120px)' }}>
-          {/* Chat Window */}
-          <div className="lg:col-span-3 h-full">
-            <ChatWindow messages={messages} onSend={handleSend} isLoading={isLoading} />
+      <main className="flex-1 flex overflow-hidden">
+        <div className="flex-1 grid grid-cols-1 lg:grid-cols-4 gap-6 p-4">
+          
+          {/* Main Chat Window */}
+          <div className="lg:col-span-3 flex flex-col h-full">
+            <ChatWindow messages={messages} onSend={handleSend} isAiTyping={isAiTyping} />
           </div>
 
           {/* Sidebar */}
-          <div className="lg:col-span-1 space-y-4 overflow-y-auto">
-            {/* Quick Actions */}
-            <div className="bg-white rounded-lg shadow-lg p-4">
-              <h3 className="font-semibold text-gray-800 mb-3">Quick Actions</h3>
-              <div className="space-y-2">
-                <button
-                  onClick={() => handleSend("I'm feeling anxious")}
-                  className="w-full text-left px-3 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors"
-                >
-                  😰 I&apos;m feeling anxious
-                </button>
-                <button
-                  onClick={() => handleSend("I need help with stress")}
-                  className="w-full text-left px-3 py-2 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors"
-                >
-                  😤 I need help with stress
-                </button>
-                <button
-                  onClick={() => handleSend("I want to talk about my mood")}
-                  className="w-full text-left px-3 py-2 bg-purple-50 text-purple-700 rounded-lg hover:bg-purple-100 transition-colors"
-                >
-                  😔 I want to talk about my mood
-                </button>
-              </div>
-            </div>
+          <aside className="hidden lg:flex flex-col space-y-6 overflow-y-auto">
+            <SidebarCard title="Conversation Starters">
+              <SidebarButton icon={Feather} text="I'm feeling anxious" onSend={handleSend} />
+              <SidebarButton icon={HeartPulse} text="I need help with stress" onSend={handleSend} />
+              <SidebarButton icon={BrainCircuit} text="Let's do a mindfulness exercise" onSend={handleSend} />
+            </SidebarCard>
+            
+            <SidebarCard title="Today's Focus">
+                <div className="flex items-start space-x-3">
+                    <BookOpen className="h-8 w-8 text-teal-600 flex-shrink-0 mt-1" />
+                    <p className="text-slate-600 italic">“{dailyQuote}”</p>
+                </div>
+            </SidebarCard>
 
-            {/* Resources */}
-            <div className="bg-white rounded-lg shadow-lg p-4">
-              <h3 className="font-semibold text-gray-800 mb-3">Resources</h3>
-              <div className="space-y-2 text-sm">
-                <p className="text-gray-600">• National Suicide Prevention: 9152987821</p>
-                <a href="https://icallhelpline.org/" className="text-gray-600">• Mental Health India</a>
-              </div>
-            </div>
-          </div>
+            <SidebarCard title="Find Support">
+                <p className="text-sm text-slate-600 mb-3">If you're in distress, please reach out. You are not alone.</p>
+                <a href="tel:9152987821" className="flex items-center space-x-3 px-3 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-colors">
+                    <Phone size={16}/>
+                    <span>Vandrevala Foundation</span>
+                </a>
+            </SidebarCard>
+          </aside>
         </div>
-      </div>
+      </main>
     </div>
   );
 }
+
+// --- Sidebar Helper Components ---
+const SidebarCard = ({ title, children }) => (
+    <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+        className="bg-white/60 backdrop-blur-lg rounded-2xl shadow-sm border border-slate-200/80 p-5"
+    >
+        <h3 className="font-semibold text-slate-800 mb-4">{title}</h3>
+        <div className="space-y-2">{children}</div>
+    </motion.div>
+);
+
+const SidebarButton = ({ icon: Icon, text, onSend }) => (
+    <button
+        onClick={() => onSend(text)}
+        className="w-full flex items-center space-x-3 text-left px-3 py-2 bg-slate-50 text-slate-700 rounded-lg hover:bg-slate-200/70 transition-colors"
+    >
+        <Icon size={18} className="text-teal-600" />
+        <span className="text-sm">{text}</span>
+    </button>
+);
