@@ -6,6 +6,7 @@ import MoodGraph from '../../components/MoodGraph';
 import Navigation from '../../components/Navigation';
 import { api } from '../../lib/api';
 import { useAuth } from '../../lib/authContext';
+import { moodStorage } from '../../lib/localStorage';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -31,7 +32,22 @@ export default function DashboardPage() {
       setIsLoading(true);
       console.log('🔄 Loading dashboard data...');
       
-      // Load mood entries, insights, and today's mood in parallel
+      // First load from localStorage for quick display
+      const savedEntries = moodStorage.getEntries(user.uid);
+      const savedInsights = moodStorage.getInsights(user.uid);
+      const savedTodayMood = moodStorage.getTodayMood(user.uid);
+      
+      if (savedEntries && savedEntries.length > 0) {
+        setMoodEntries(savedEntries);
+      }
+      if (savedInsights) {
+        setInsights(savedInsights);
+      }
+      if (savedTodayMood) {
+        setTodayMood(savedTodayMood);
+      }
+      
+      // Then fetch fresh data from server
       const [entriesData, insightsData, todayData] = await Promise.all([
         api.mood.getMoodEntries({ limit: 30 }),
         api.mood.getMoodInsights(7),
@@ -47,6 +63,17 @@ export default function DashboardPage() {
       setMoodEntries(entriesData || []);
       setInsights(insightsData || null);
       setTodayMood(todayData || null);
+      
+      // Save to localStorage
+      if (entriesData) {
+        moodStorage.saveEntries(user.uid, entriesData);
+      }
+      if (insightsData) {
+        moodStorage.saveInsights(user.uid, insightsData);
+      }
+      if (todayData) {
+        moodStorage.saveTodayMood(user.uid, todayData);
+      }
     } catch (error) {
       console.error('❌ Error loading dashboard data:', error);
       setError(`Failed to load dashboard data: ${error.message}`);
@@ -74,10 +101,27 @@ export default function DashboardPage() {
         sleep: newMood.sleep
       };
 
-      await api.mood.logMood(moodData);
+      const response = await api.mood.logMood(moodData);
       
-      // Reload dashboard data to show the new entry
-      await loadDashboardData();
+      // Update local state immediately
+      const newMoodEntry = response.moodEntry;
+      setMoodEntries(prev => [newMoodEntry, ...prev]);
+      
+      // Update today's mood
+      setTodayMood({ hasEntry: true, moodEntry: newMoodEntry });
+      
+      // Save to localStorage
+      moodStorage.saveEntries(user.uid, [newMoodEntry, ...moodEntries]);
+      moodStorage.saveTodayMood(user.uid, { hasEntry: true, moodEntry: newMoodEntry });
+      
+      // Reload insights
+      try {
+        const insightsData = await api.mood.getMoodInsights(7);
+        setInsights(insightsData);
+        moodStorage.saveInsights(user.uid, insightsData);
+      } catch (error) {
+        console.error('Error updating insights:', error);
+      }
       
       setNewMood({ level: 5, note: '', energy: 3, stress: 3, sleep: 7 });
       setShowForm(false);

@@ -6,6 +6,7 @@ import ActivityCard from '../../components/ActivityCard';
 import Navigation from '../../components/Navigation';
 import { useAuth } from '../../lib/authContext';
 import { api } from '../../lib/api';
+import { activitiesStorage } from '../../lib/localStorage';
 
 export default function ActivitiesPage() {
   const router = useRouter();
@@ -25,11 +26,29 @@ export default function ActivitiesPage() {
   const loadActivities = async () => {
     try {
       setIsLoading(true);
+      
+      // First try to load from localStorage
+      const savedActivities = activitiesStorage.getActivities(user.uid);
+      if (savedActivities && savedActivities.length > 0) {
+        setActivities(savedActivities);
+        setIsLoading(false);
+      }
+      
+      // Then fetch fresh data from server
       const activitiesData = await api.activities.getTodayActivities();
       setActivities(activitiesData);
+      
+      // Save to localStorage
+      activitiesStorage.saveActivities(user.uid, activitiesData);
     } catch (error) {
       console.error('Error loading activities:', error);
       setError('Failed to load activities');
+      
+      // If API fails, use saved data if available
+      const savedActivities = activitiesStorage.getActivities(user.uid);
+      if (savedActivities && savedActivities.length > 0) {
+        setActivities(savedActivities);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -40,13 +59,16 @@ export default function ActivitiesPage() {
       await api.activities.completeActivity(activityId);
       
       // Update the activity status locally
-      setActivities(prev => 
-        prev.map(activity => 
-          activity.id === activityId 
-            ? { ...activity, completed: true }
-            : activity
-        )
+      const updatedActivities = activities.map(activity => 
+        activity.id === activityId 
+          ? { ...activity, completed: true }
+          : activity
       );
+      
+      setActivities(updatedActivities);
+      
+      // Save to localStorage
+      activitiesStorage.saveActivities(user.uid, updatedActivities);
     } catch (error) {
       console.error('Error completing activity:', error);
       setError('Failed to complete activity. Please try again.');

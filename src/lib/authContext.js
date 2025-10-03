@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useEffect } from 'react';
 import { api } from './api';
+import { clearUserData } from './localStorage';
 
 const AuthContext = createContext();
 
@@ -90,11 +91,16 @@ export const AuthProvider = ({ children }) => {
 
   const signOut = async () => {
     try {
+      // Clear user data from localStorage
+      if (user?.uid) {
+        clearUserData(user.uid);
+      }
+      
       // Clear local state
       setUser(null);
       setToken(null);
       
-      // Clear localStorage
+      // Clear auth localStorage
       localStorage.removeItem('authToken');
       localStorage.removeItem('user');
       

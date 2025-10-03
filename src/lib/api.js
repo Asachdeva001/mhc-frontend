@@ -65,6 +65,33 @@ export const api = {
     });
   },
 
+  // Chat conversation endpoints
+  chat: {
+    saveConversation: async (messages, sessionId = null) => {
+      return apiCall('/api/generate/save-conversation', {
+        method: 'POST',
+        body: JSON.stringify({
+          messages,
+          sessionId,
+        }),
+      });
+    },
+
+    getConversations: async (limit = 10) => {
+      return apiCall(`/api/generate/conversations?limit=${limit}`);
+    },
+
+    getConversation: async (sessionId) => {
+      return apiCall(`/api/generate/conversation/${sessionId}`);
+    },
+
+    deleteConversation: async (sessionId) => {
+      return apiCall(`/api/generate/conversation/${sessionId}`, {
+        method: 'DELETE',
+      });
+    },
+  },
+
   // Auth endpoints
   auth: {
     signup: async (userData) => {

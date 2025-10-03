@@ -6,27 +6,159 @@ import ChatWindow from '../../components/ChatWindow';
 import Navigation from '../../components/Navigation';
 import { useAuth } from '../../lib/authContext';
 import { api } from '../../lib/api';
+import { chatStorage } from '../../lib/localStorage';
+import { messageEncryption, encryptionKeyStorage } from '../../lib/encryption';
 
 export default function ChatPage() {
   const router = useRouter();
   const { user, isAuthenticated, loading } = useAuth();
-  const [messages, setMessages] = useState([
-    {
-      text: "Hello! I'm Mental Health Buddy, your AI wellness companion. How are you feeling today?",
-      sender: 'ai',
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    }
-  ]);
+  const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [conversationHistory, setConversationHistory] = useState([]);
+  const [sessionId, setSessionId] = useState(null);
+  const [encryptionPassword, setEncryptionPassword] = useState(null);
+  const [isInitializingEncryption, setIsInitializingEncryption] = useState(true);
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
       router.push('/auth/signin');
+    } else if (isAuthenticated && user) {
+      // Initialize encryption first, then load messages
+      initializeEncryption();
     }
-  }, [isAuthenticated, loading, router]);
+  }, [isAuthenticated, loading, router, user]);
+
+  const initializeEncryption = async () => {
+    try {
+      setIsInitializingEncryption(true);
+      // Generate encryption password based on user ID and device info
+      const password = await messageEncryption.generateSecurePassword(user.uid);
+      setEncryptionPassword(password);
+      
+      // Store key hash for verification
+      const keyHash = await messageEncryption.generateSecurePassword(user.uid + '_hash');
+      encryptionKeyStorage.storeKeyHash(user.uid, keyHash);
+      
+      console.log('🔐 Encryption initialized for user:', user.uid);
+      
+      // Load saved messages after encryption is ready
+      await loadSavedMessages(password);
+    } catch (error) {
+      console.error('Failed to initialize encryption:', error);
+      // Fallback: load messages without encryption
+      await loadSavedMessages(null);
+    } finally {
+      setIsInitializingEncryption(false);
+    }
+  };
+
+  const loadSavedMessages = async (password = null) => {
+    try {
+      // First try to load from localStorage for immediate display
+      const savedMessages = chatStorage.getMessages(user.uid);
+      let decryptedMessages = savedMessages;
+
+      // Decrypt messages if encryption is available and messages are encrypted
+      if (password && savedMessages && savedMessages.length > 0) {
+        try {
+          decryptedMessages = await messageEncryption.decryptMessages(savedMessages, password);
+        } catch (decryptError) {
+          console.warn('Failed to decrypt localStorage messages:', decryptError);
+          decryptedMessages = savedMessages;
+        }
+      }
+
+      if (decryptedMessages && decryptedMessages.length > 0) {
+        setMessages(decryptedMessages);
+        // Try to get session ID from saved messages
+        const lastMessage = decryptedMessages[decryptedMessages.length - 1];
+        if (lastMessage?.sessionId) {
+          setSessionId(lastMessage.sessionId);
+        }
+      }
+
+      // Then try to sync with backend
+      try {
+        const conversations = await api.chat.getConversations(1);
+        if (conversations && conversations.length > 0) {
+          const latestConversation = conversations[0];
+          let backendMessages = latestConversation.messages;
+
+          // Decrypt backend messages if encryption is available
+          if (password && backendMessages && backendMessages.length > 0) {
+            try {
+              backendMessages = await messageEncryption.decryptMessages(backendMessages, password);
+            } catch (decryptError) {
+              console.warn('Failed to decrypt backend messages:', decryptError);
+              // Use encrypted messages as fallback
+              backendMessages = latestConversation.messages;
+            }
+          }
+
+          setMessages(backendMessages);
+          setSessionId(latestConversation.sessionId);
+          // Update localStorage with decrypted backend data
+          chatStorage.saveMessages(user.uid, backendMessages);
+        } else if (!decryptedMessages || decryptedMessages.length === 0) {
+          // Initialize with welcome message if no saved messages
+          const welcomeMessage = {
+            text: "Hello! I'm Mental Health Buddy, your AI wellness companion. How are you feeling today?",
+            sender: 'ai',
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          };
+          setMessages([welcomeMessage]);
+          chatStorage.saveMessages(user.uid, [welcomeMessage]);
+          
+          // Create new session
+          const newSessionId = `session_${Date.now()}`;
+          setSessionId(newSessionId);
+          
+          // Save to backend (encrypted if password available)
+          try {
+            let messagesToSave = [welcomeMessage];
+            if (password) {
+              messagesToSave = await messageEncryption.encryptMessages([welcomeMessage], password);
+            }
+            await api.chat.saveConversation(messagesToSave, newSessionId);
+          } catch (error) {
+            console.error('Error saving initial conversation:', error);
+          }
+        }
+      } catch (error) {
+        console.warn('Backend not available, using localStorage only:', error.message);
+        // If backend fails, use localStorage data
+        if (!decryptedMessages || decryptedMessages.length === 0) {
+          const welcomeMessage = {
+            text: "Hello! I'm Mental Health Buddy, your AI wellness companion. How are you feeling today?",
+            sender: 'ai',
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          };
+          setMessages([welcomeMessage]);
+          chatStorage.saveMessages(user.uid, [welcomeMessage]);
+          
+          // Create new session for offline mode
+          const newSessionId = `session_${Date.now()}`;
+          setSessionId(newSessionId);
+        }
+      }
+    } catch (error) {
+      console.error('Error loading saved messages:', error);
+      // Fallback welcome message
+      const welcomeMessage = {
+        text: "Hello! I'm Mental Health Buddy, your AI wellness companion. How are you feeling today?",
+        sender: 'ai',
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      };
+      setMessages([welcomeMessage]);
+    }
+  };
 
   const handleSend = async (messageText) => {
+    if (!encryptionPassword) {
+      console.error('Encryption not initialized');
+      return;
+    }
+
     // Add user message
     const userMessage = {
       text: messageText,
@@ -34,14 +166,25 @@ export default function ChatPage() {
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
 
-    setMessages(prev => [...prev, userMessage]);
+    const updatedMessages = [...messages, userMessage];
+    setMessages(updatedMessages);
+    
+    // Save user message immediately (encrypted)
+    try {
+      const encryptedMessages = await messageEncryption.encryptMessages(updatedMessages, encryptionPassword);
+      chatStorage.saveMessages(user.uid, encryptedMessages);
+    } catch (error) {
+      console.warn('Failed to encrypt messages for localStorage:', error);
+      chatStorage.saveMessages(user.uid, updatedMessages);
+    }
+    
     setIsLoading(true);
 
     try {
-      // Convert messages to the format expected by the API
+      // Convert messages to the format expected by the API (decrypted for AI processing)
       const apiMessages = messages.map(msg => ({
         role: msg.sender === 'ai' ? 'assistant' : 'user',
-        content: msg.text
+        content: typeof msg.text === 'object' ? 'Encrypted message' : msg.text
       }));
 
       // Get AI response from backend
@@ -53,7 +196,22 @@ export default function ChatPage() {
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
 
-      setMessages(prev => [...prev, aiResponse]);
+      const finalMessages = [...updatedMessages, aiResponse];
+      setMessages(finalMessages);
+      
+      // Save the complete conversation (encrypted)
+      try {
+        const encryptedFinalMessages = await messageEncryption.encryptMessages(finalMessages, encryptionPassword);
+        chatStorage.saveMessages(user.uid, encryptedFinalMessages);
+        
+        // Save to backend (encrypted)
+        await api.chat.saveConversation(encryptedFinalMessages, sessionId);
+      } catch (encryptError) {
+        console.warn('Failed to encrypt messages:', encryptError);
+        // Save unencrypted as fallback
+        chatStorage.saveMessages(user.uid, finalMessages);
+        await api.chat.saveConversation(finalMessages, sessionId);
+      }
     } catch (error) {
       console.error('Error getting AI response:', error);
       
@@ -64,18 +222,34 @@ export default function ChatPage() {
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
 
-      setMessages(prev => [...prev, fallbackResponse]);
+      const finalMessages = [...updatedMessages, fallbackResponse];
+      setMessages(finalMessages);
+      
+      // Save fallback response (encrypted)
+      try {
+        const encryptedFallbackMessages = await messageEncryption.encryptMessages(finalMessages, encryptionPassword);
+        chatStorage.saveMessages(user.uid, encryptedFallbackMessages);
+        await api.chat.saveConversation(encryptedFallbackMessages, sessionId);
+      } catch (encryptError) {
+        console.warn('Failed to encrypt fallback messages:', encryptError);
+        chatStorage.saveMessages(user.uid, finalMessages);
+        await api.chat.saveConversation(finalMessages, sessionId);
+      }
     } finally {
       setIsLoading(false);
     }
   };
 
-  if (loading) {
+  if (loading || isInitializingEncryption) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="text-2xl font-semibold text-gray-800 mb-2">Loading...</div>
-          <div className="text-gray-600">Please wait while we authenticate you</div>
+          <div className="text-2xl font-semibold text-gray-800 mb-2">
+            {loading ? 'Loading...' : 'Initializing Encryption...'}
+          </div>
+          <div className="text-gray-600">
+            {loading ? 'Please wait while we authenticate you' : 'Setting up secure messaging...'}
+          </div>
         </div>
       </div>
     );
@@ -99,6 +273,44 @@ export default function ChatPage() {
 
           {/* Sidebar */}
           <div className="lg:col-span-1 space-y-4 overflow-y-auto">
+            {/* Chat Controls */}
+            <div className="bg-white rounded-lg shadow-lg p-4">
+              <h3 className="font-semibold text-gray-800 mb-3">Chat Controls</h3>
+              <div className="space-y-2">
+                <button
+                  onClick={async () => {
+                    const welcomeMessage = {
+                      text: "Hello! I'm Mental Health Buddy, your AI wellness companion. How are you feeling today?",
+                      sender: 'ai',
+                      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                    };
+                    setMessages([welcomeMessage]);
+                    
+                    // Create new session
+                    const newSessionId = `session_${Date.now()}`;
+                    setSessionId(newSessionId);
+                    
+                    // Save encrypted messages
+                    try {
+                      if (encryptionPassword) {
+                        const encryptedMessages = await messageEncryption.encryptMessages([welcomeMessage], encryptionPassword);
+                        chatStorage.saveMessages(user.uid, encryptedMessages);
+                        await api.chat.saveConversation(encryptedMessages, newSessionId);
+                      } else {
+                        chatStorage.saveMessages(user.uid, [welcomeMessage]);
+                        await api.chat.saveConversation([welcomeMessage], newSessionId);
+                      }
+                    } catch (error) {
+                      console.warn('Backend sync failed, data saved locally:', error.message);
+                    }
+                  }}
+                  className="w-full px-3 py-2 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition-colors text-sm"
+                >
+                  🔄 Clear Chat
+                </button>
+              </div>
+            </div>
+
             {/* Quick Actions */}
             <div className="bg-white rounded-lg shadow-lg p-4">
               <h3 className="font-semibold text-gray-800 mb-3">Quick Actions</h3>
