@@ -89,6 +89,33 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const refreshToken = async () => {
+    try {
+      const storedUser = localStorage.getItem('user');
+      if (!storedUser) {
+        throw new Error('No user data found');
+      }
+
+      const userData = JSON.parse(storedUser);
+      console.log('🔄 Refreshing token for user:', userData.email);
+
+      // Generate new token by creating a new timestamp
+      const newTimestamp = Date.now();
+      const newToken = Buffer.from(`${userData.uid}:${newTimestamp}`).toString('base64');
+      
+      setToken(newToken);
+      localStorage.setItem('authToken', newToken);
+      
+      console.log('✅ Token refreshed successfully');
+      return newToken;
+    } catch (error) {
+      console.error('❌ Token refresh error:', error);
+      // If refresh fails, sign out the user
+      await signOut();
+      throw error;
+    }
+  };
+
   const signOut = async () => {
     try {
       // Clear user data from localStorage
@@ -125,6 +152,7 @@ export const AuthProvider = ({ children }) => {
     signUp,
     signIn,
     signOut,
+    refreshToken,
     getCurrentUser,
     getToken,
     isAuthenticated: !!user
