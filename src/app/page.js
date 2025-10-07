@@ -3,17 +3,17 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../lib/authContext';
-import { useEffect, useState } from 'react'; // Import useState
+import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageSquareHeart, BarChart3, Sparkles, UserPlus, PencilLine, BotMessageSquare } from 'lucide-react';
 
-// This component remains the same
+// Updated background gradient with a green theme
 const BackgroundGradient = () => (
-  <div className="absolute inset-0 -z-10 bg-gradient-to-tr from-blue-100 via-purple-100 to-cyan-100" />
+  <div className="absolute inset-0 -z-10 bg-gradient-to-tr from-emerald-50 via-teal-50 to-cyan-50" />
 );
 
 
-// Reusable component for feature cards (with added hover effect)
+// Reusable component for feature cards (styles are theme-agnostic)
 const FeatureCard = ({ icon, title, text, delay }) => {
   const cardVariants = {
     offscreen: { y: 50, opacity: 0 },
@@ -93,29 +93,28 @@ export default function LandingPage() {
   };
 
   return (
-    // FIX: Added `relative` class here to contain the absolute blobs
-    <div className="relative min-h-screen w-full font-sans text-gray-800 animated-gradient overflow-x-hidden">
+    <div className="relative min-h-screen w-full font-sans text-gray-800 overflow-x-hidden">
       <BackgroundGradient />
       
-      {/* IMPROVED NAVBAR */}
+      {/* NAVBAR WITH GREEN THEME */}
       <motion.header 
         className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
         animate={{
           backgroundColor: scrolled ? 'rgba(255, 255, 255, 0.8)' : 'rgba(255, 255, 255, 0)',
           backdropFilter: scrolled ? 'blur(12px)' : 'blur(0px)',
-          boxShadow: scrolled ? '0 4px 6px -1px rgba(0, 0, 0, 0.1)' : 'none',
+          boxShadow: scrolled ? '0 4px_6px -1px rgba(0, 0, 0, 0.05)' : 'none',
         }}
       >
         <div className="container mx-auto px-6 py-4 flex justify-between items-center">
           <Link href="/" className="text-2xl font-bold text-gray-800">
-            Mental<span className="text-blue-500">Buddy</span>
+            Mental<span className="text-emerald-600">Buddy</span>
           </Link>
           <nav className="flex items-center space-x-2 md:space-x-4">
-            <Link href="/auth/signin" className="px-4 py-2 text-gray-600 hover:text-blue-500 transition-colors rounded-full hover:bg-gray-900/5">
+            <Link href="/auth/signin" className="px-4 py-2 text-gray-600 hover:text-emerald-600 transition-colors rounded-full hover:bg-gray-900/5">
               Sign In
             </Link>
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Link href="/auth/signup" className="bg-blue-500 text-white font-semibold px-5 py-2 rounded-full hover:bg-blue-600 transition-all duration-300 shadow-lg hover:shadow-blue-500/30">
+              <Link href="/auth/signup" className="bg-emerald-500 text-white font-semibold px-5 py-2 rounded-full hover:bg-emerald-600 transition-all duration-300 shadow-lg hover:shadow-emerald-500/30">
                 Sign Up
               </Link>
             </motion.div>
@@ -134,7 +133,7 @@ export default function LandingPage() {
           >
             <motion.span className="block" variants={heroItemVariants}>A helping hand for a</motion.span>
             <motion.span 
-              className="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-blue-500 block"
+              className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-600 block"
               variants={heroItemVariants}
             >
               healthier mind
@@ -152,20 +151,18 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.6 }}
-            whileHover={{ scale: 1.05, boxShadow: '0px 15px 30px -10px rgba(71, 145, 255, 0.4)' }}
+            whileHover={{ scale: 1.05, boxShadow: '0px 15px 30px -10px rgba(16, 185, 129, 0.4)' }}
             whileTap={{ scale: 0.95 }}
           >
             <Link
               href="/auth/signup"
-              className="bg-blue-500 text-white font-bold py-4 px-10 rounded-full text-lg transition-all duration-300 shadow-xl"
+              className="bg-emerald-500 text-white font-bold py-4 px-10 rounded-full text-lg transition-all duration-300 shadow-xl"
             >
               Get Started for Free
             </Link>
           </motion.div>
         </section>
         
-        {/* All other sections (Features, How it Works, etc.) remain the same */}
-        {/* ... (Paste the rest of the sections from the previous code here) ... */}
         {/* Features Section */}
         <section className="container mx-auto px-6 py-20">
           <div className="text-center mb-16">
@@ -174,13 +171,13 @@ export default function LandingPage() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <FeatureCard
-              icon={<MessageSquareHeart size={32} className="text-purple-500" />}
+              icon={<MessageSquareHeart size={32} className="text-emerald-500" />}
               title="AI Chat Support"
               text="Get instant, compassionate, and personalized mental health support whenever you need it."
               delay={0.1}
             />
             <FeatureCard
-              icon={<BarChart3 size={32} className="text-blue-500" />}
+              icon={<BarChart3 size={32} className="text-teal-500" />}
               title="Mood Tracking"
               text="Log your emotional patterns with insightful analytics to understand your journey and progress."
               delay={0.2}
@@ -203,14 +200,14 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
             <motion.div initial={{y: 20, opacity: 0}} whileInView={{y: 0, opacity: 1}} transition={{delay: 0.1}} viewport={{ once: true }}>
               <div className="flex justify-center items-center mb-4 h-16 w-16 mx-auto bg-white rounded-full shadow-lg border">
-                <UserPlus size={32} className="text-purple-500" />
+                <UserPlus size={32} className="text-emerald-500" />
               </div>
               <h3 className="text-xl font-semibold mb-2">1. Create Account</h3>
               <p className="text-gray-600">Sign up for free and tell us a little about your goals.</p>
             </motion.div>
             <motion.div initial={{y: 20, opacity: 0}} whileInView={{y: 0, opacity: 1}} transition={{delay: 0.2}} viewport={{ once: true }}>
               <div className="flex justify-center items-center mb-4 h-16 w-16 mx-auto bg-white rounded-full shadow-lg border">
-                <PencilLine size={32} className="text-blue-500" />
+                <PencilLine size={32} className="text-teal-500" />
               </div>
               <h3 className="text-xl font-semibold mb-2">2. Log Your Moods</h3>
               <p className="text-gray-600">Start tracking your feelings and activities to find patterns.</p>

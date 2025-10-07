@@ -39,21 +39,21 @@ export default function SignInPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex flex-col items-center justify-center">
-        <ImSpinner9 className="text-4xl text-blue-600 animate-spin mb-4" />
+      <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-50 flex flex-col items-center justify-center">
+        <ImSpinner9 className="text-4xl text-emerald-600 animate-spin mb-4" />
         <h2 className="text-2xl font-semibold text-gray-800">Checking Session...</h2>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-50 flex items-center justify-center px-4">
       <div className="max-w-md w-full">
         {/* Header */}
         <div className="text-center mb-6">
           <Link
             href="/"
-            className="inline-block bg-blue-100 text-blue-800 font-semibold px-5 py-2 rounded-full text-sm hover:bg-blue-200 transition-colors duration-300 shadow-sm mb-4"
+            className="inline-block bg-white/80 text-emerald-800 font-semibold px-5 py-2 rounded-full text-sm hover:bg-white transition-all duration-300 shadow-sm mb-4"
           >
             Back to Home
           </Link>
@@ -61,10 +61,10 @@ export default function SignInPage() {
           <p className="text-gray-600 mt-1">Sign in to continue your journey</p>
         </div>
 
-        {/* Card */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-200/80">
+        {/* Card with "Glassmorphism" effect for consistency */}
+        <div className="bg-white/60 backdrop-blur-xl rounded-2xl shadow-xl p-8 border border-white/20">
           {error && (
-            <div className="flex items-center mb-4 p-3 bg-red-50 rounded-lg text-red-700 text-sm">
+            <div className="flex items-center mb-4 p-3 bg-red-100 rounded-lg text-red-700 text-sm border border-red-200">
               <FiAlertCircle className="mr-2 flex-shrink-0" /> {error}
             </div>
           )}
@@ -80,7 +80,7 @@ export default function SignInPage() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="text-gray-700 w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="text-gray-700 w-full pl-10 pr-3 py-2.5 bg-white/70 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all"
                 placeholder="you@example.com"
                 required
               />
@@ -96,7 +96,7 @@ export default function SignInPage() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="text-gray-700 w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="text-gray-700 w-full pl-10 pr-3 py-2.5 bg-white/70 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all"
                 placeholder="Enter your password"
                 required
               />
@@ -106,7 +106,7 @@ export default function SignInPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center disabled:bg-blue-400"
+              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center disabled:bg-emerald-400 disabled:cursor-not-allowed"
             >
               {isLoading ? (
                 <>
@@ -122,7 +122,7 @@ export default function SignInPage() {
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-700">
               Don’t have an account?{' '}
-              <Link href="/auth/signup" className="font-semibold text-blue-600 hover:text-blue-800">
+              <Link href="/auth/signup" className="font-semibold text-emerald-600 hover:text-emerald-800 transition-colors">
                 Sign Up
               </Link>
             </p>
