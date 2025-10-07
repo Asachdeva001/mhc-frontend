@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { motion } from 'framer-motion';
 import ChatWindow from '../../components/ChatWindow';
 import Navigation from '../../components/Navigation';
 import { useAuth } from '../../lib/authContext';
@@ -188,7 +189,6 @@ export default function ChatPage() {
         content: typeof msg.text === 'object' ? 'Encrypted message' : msg.text
       }));
 
-      // Get AI response from backend
       const response = await api.generateResponse(messageText, apiMessages, null, user?.uid);
       
       const aiResponse = {
@@ -216,9 +216,8 @@ export default function ChatPage() {
     } catch (error) {
       console.error('Error getting AI response:', error);
       
-      // Fallback response if API fails
       const fallbackResponse = {
-        text: "I'm sorry, I'm having trouble connecting right now. Please try again in a moment.",
+        text: "I'm sorry, I'm having trouble connecting right now. Please check your connection and try again.",
         sender: 'ai',
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
@@ -237,7 +236,7 @@ export default function ChatPage() {
         await api.chat.saveConversation(finalMessages, sessionId);
       }
     } finally {
-      setIsLoading(false);
+      setIsAiTyping(false);
     }
   };
 
@@ -256,12 +255,8 @@ export default function ChatPage() {
     );
   }
 
-  if (!isAuthenticated || !user) {
-    return null; // Will redirect to signin
-  }
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
+    <div className="flex flex-col h-screen bg-gradient-to-br from-emerald-50 via-slate-50 to-sky-50">
       <Navigation currentPage="chat" />
 
       {/* Chat Interface */}
@@ -408,3 +403,26 @@ export default function ChatPage() {
     </div>
   );
 }
+
+// --- Sidebar Helper Components ---
+const SidebarCard = ({ title, children }) => (
+    <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+        className="bg-white/60 backdrop-blur-lg rounded-2xl shadow-sm border border-slate-200/80 p-5"
+    >
+        <h3 className="font-semibold text-slate-800 mb-4">{title}</h3>
+        <div className="space-y-2">{children}</div>
+    </motion.div>
+);
+
+const SidebarButton = ({ icon: Icon, text, onSend }) => (
+    <button
+        onClick={() => onSend(text)}
+        className="w-full flex items-center space-x-3 text-left px-3 py-2 bg-slate-50 text-slate-700 rounded-lg hover:bg-slate-200/70 transition-colors"
+    >
+        <Icon size={18} className="text-teal-600" />
+        <span className="text-sm">{text}</span>
+    </button>
+);
