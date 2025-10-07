@@ -18,6 +18,7 @@ export default function ChatPage() {
   const [sessionId, setSessionId] = useState(null);
   const [encryptionPassword, setEncryptionPassword] = useState(null);
   const [isInitializingEncryption, setIsInitializingEncryption] = useState(true);
+  const [autoSpeakEnabled, setAutoSpeakEnabled] = useState(false);
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -268,11 +269,68 @@ export default function ChatPage() {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6" style={{ height: 'calc(100vh - 120px)' }}>
           {/* Chat Window */}
           <div className="lg:col-span-3 h-full">
-            <ChatWindow messages={messages} onSend={handleSend} isLoading={isLoading} />
+            <ChatWindow 
+              messages={messages} 
+              onSend={handleSend} 
+              isLoading={isLoading} 
+              autoSpeakResponse={autoSpeakEnabled}
+            />
           </div>
 
           {/* Sidebar */}
           <div className="lg:col-span-1 space-y-4 overflow-y-auto">
+            {/* Voice Controls */}
+            <div className="bg-white rounded-lg shadow-lg p-4">
+              <h3 className="font-semibold text-gray-800 mb-3 flex items-center space-x-2">
+                <svg className="w-5 h-5 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 006 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z" clipRule="evenodd" />
+                </svg>
+                <span>Voice Assistant</span>
+              </h3>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between p-3 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg">
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-gray-800">Auto-speak responses</p>
+                    <p className="text-xs text-gray-600 mt-0.5">AI will speak all responses aloud</p>
+                  </div>
+                  <button
+                    onClick={() => setAutoSpeakEnabled(!autoSpeakEnabled)}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 ${
+                      autoSpeakEnabled ? 'bg-purple-600' : 'bg-gray-300'
+                    }`}
+                    role="switch"
+                    aria-checked={autoSpeakEnabled}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                        autoSpeakEnabled ? 'translate-x-6' : 'translate-x-1'
+                      }`}
+                    />
+                  </button>
+                </div>
+                <div className="text-xs text-gray-600 space-y-1 p-3 bg-blue-50 rounded-lg">
+                  <p className="flex items-center space-x-1">
+                    <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                    </svg>
+                    <span>Click the microphone to speak</span>
+                  </p>
+                  <p className="flex items-center space-x-1">
+                    <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                    </svg>
+                    <span>Click &quot;Read aloud&quot; on any message</span>
+                  </p>
+                  <p className="flex items-center space-x-1">
+                    <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                    </svg>
+                    <span>Voice messages get voice replies automatically</span>
+                  </p>
+                </div>
+              </div>
+            </div>
+            
             {/* Chat Controls */}
             <div className="bg-white rounded-lg shadow-lg p-4">
               <h3 className="font-semibold text-gray-800 mb-3">Chat Controls</h3>

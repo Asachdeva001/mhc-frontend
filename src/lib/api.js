@@ -1,8 +1,29 @@
 // API configuration for connecting to the backend
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
+// Helper function to refresh token
+const refreshAuthToken = async () => {
+  try {
+    const storedUser = localStorage.getItem('user');
+    if (!storedUser) {
+      throw new Error('No user data found');
+    }
+
+    const userData = JSON.parse(storedUser);
+    const newTimestamp = Date.now();
+    const newToken = btoa(`${userData.uid}:${newTimestamp}`);
+    
+    localStorage.setItem('authToken', newToken);
+    console.log('🔄 Token refreshed successfully');
+    return newToken;
+  } catch (error) {
+    console.error('❌ Token refresh failed:', error);
+    throw error;
+  }
+};
+
 // Helper function to make API calls
-const apiCall = async (endpoint, options = {}) => {
+const apiCall = async (endpoint, options = {}, isRetry = false) => {
   const url = `${API_BASE_URL}${endpoint}`;
   
   const defaultOptions = {
@@ -35,9 +56,28 @@ const apiCall = async (endpoint, options = {}) => {
 
     console.log('📡 API response status:', response.status, 'for', endpoint);
 
+    // Handle 401 - Token expired
+    if (response.status === 401 && !isRetry) {
+      console.log('🔐 Token expired, attempting refresh...');
+      try {
+        await refreshAuthToken();
+        // Retry the request with new token
+        return apiCall(endpoint, options, true);
+      } catch (refreshError) {
+        console.error('❌ Token refresh failed, redirecting to signin');
+        // Clear auth data and redirect
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('user');
+        if (typeof window !== 'undefined') {
+          window.location.href = '/auth/signin';
+        }
+        throw new Error('Authentication expired. Please sign in again.');
+      }
+    }
+
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({ error: 'Network error' }));
-      console.error('❌ API error response:', errorData);
+      // console.error('❌ API error response:', errorData);
       throw new Error(errorData.error || 'API request failed');
     }
 
@@ -45,7 +85,8 @@ const apiCall = async (endpoint, options = {}) => {
     console.log('✅ API success for', endpoint, ':', data);
     return data;
   } catch (error) {
-    console.error('❌ API Call Error for', endpoint, ':', error);
+    // console.error("API call error ");
+    // console.error('❌ API Call Error for', endpoint, ':', error);
     throw error;
   }
 };
