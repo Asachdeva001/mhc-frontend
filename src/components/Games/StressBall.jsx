@@ -18,7 +18,7 @@ const StressBall = () => {
   const audioRef = useRef(null);
   const shape = shapes[shapeIndex];
 
-  const playSquishSound = () => {
+  const playMorphSound = () => {
     if (!audioRef.current) {
       const audioContext = new (window.AudioContext || window.webkitAudioContext)();
       const oscillator = audioContext.createOscillator();
@@ -27,8 +27,9 @@ const StressBall = () => {
       oscillator.connect(gainNode);
       gainNode.connect(audioContext.destination);
 
-      oscillator.frequency.setValueAtTime(150, audioContext.currentTime);
-      oscillator.frequency.exponentialRampToValueAtTime(50, audioContext.currentTime + 0.2);
+      oscillator.frequency.setValueAtTime(200, audioContext.currentTime);
+      oscillator.frequency.linearRampToValueAtTime(400, audioContext.currentTime + 0.1);
+      oscillator.frequency.linearRampToValueAtTime(200, audioContext.currentTime + 0.2);
 
       gainNode.gain.setValueAtTime(0.15, audioContext.currentTime);
       gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
@@ -44,7 +45,8 @@ const StressBall = () => {
   const handlePress = () => {
     setIsPressed(true);
     setPressCount(prev => prev + 1);
-    playSquishSound();
+    setShapeIndex((prev) => (prev + 1) % shapes.length);
+    playMorphSound();
   };
 
   const handleRelease = () => {
@@ -54,7 +56,7 @@ const StressBall = () => {
   return (
     <div className="flex flex-col items-center justify-center h-full bg-gradient-to-b from-orange-100 to-yellow-100 rounded-lg">
       <div className="text-slate-700 text-sm font-medium bg-white/70 px-2 py-1 rounded mb-4">
-        Click and hold to squish
+        Click to change shape
       </div>
       <motion.div
         animate={{
@@ -76,7 +78,7 @@ const StressBall = () => {
         animate={isPressed ? { scale: [1, 1.2, 1] } : {}}
         transition={{ duration: 0.3 }}
       >
-        Squishing {shape.name}<br />
+        Morphing to {shape.name}<br />
         Presses: {pressCount} | Release to bounce back
       </motion.p>
     </div>
