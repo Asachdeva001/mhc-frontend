@@ -113,6 +113,12 @@ const CalmMaze = () => {
     return () => window.removeEventListener('keydown', handleKey);
   }, [playerPos, maze]);
 
+  const handleNewLevel = () => {
+    setMaze(generateMaze());
+    setPlayerPos({ x: 1, y: 1 });
+    setCompleted(false);
+  };
+
   return (
     <div className="flex flex-col items-center">
       <div className="relative">
@@ -147,6 +153,12 @@ const CalmMaze = () => {
         Navigate with arrow keys to the glowing goal<br />
         Relax and take your time
       </p>
+      <button
+        onClick={handleNewLevel}
+        className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+      >
+        New Level
+      </button>
     </div>
   );
 };
