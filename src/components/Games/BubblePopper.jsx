@@ -7,19 +7,22 @@ const BubblePopper = () => {
   const [bubbles, setBubbles] = useState([]);
   const [particles, setParticles] = useState([]);
 
-   useEffect(() => {
-    // Generate random bubbles
-    const numBubbles = Math.floor(Math.random() * 10) + 10; // 10-20 bubbles
-    const newBubbles = Array.from({ length: numBubbles }, (_, i) => ({
-      id: i,
-      x: Math.random() * 90 + 5, // 5-95% to keep bubbles in view
-      y: Math.random() * 90 + 5, // 5-95% to keep bubbles in view
-      size: Math.random() * 50 + 20, // 20-70px
-      speed: Math.random() * 2 + 1, // 1-3 seconds
-      popped: false,
-    }));
-    setBubbles(newBubbles);
+  useEffect(() => {
+    generateBubbles(12); // initial spawn
   }, []);
+
+  const generateBubbles = (count) => {
+    const newBubbles = Array.from({ length: count }, (_, i) => ({
+      id: Date.now() + i,
+      left: Math.random() * 85 + 5,  // Spread 5–90%
+      top: Math.random() * 85 + 5,
+      size: Math.random() * 50 + 20,
+      speed: Math.random() * 2 + 1,
+      popped: false
+    }));
+
+    setBubbles((prev) => [...prev, ...newBubbles]);
+  };
 
   const playPopSound = () => {
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -40,40 +43,31 @@ const BubblePopper = () => {
   };
 
   const popBubble = (id, x, y) => {
-    setBubbles(prev => {
-      const updated = prev.map(b => b.id === id ? { ...b, popped: true } : b);
-      // If only 3 or fewer bubbles left, add 10 more
-      const activeBubbles = updated.filter(b => !b.popped);
-      if (activeBubbles.length <= 3) {
-        const numNew = 10;
-        const newBubbles = Array.from({ length: numNew }, (_, i) => ({
-          id: Date.now() + i,
-          x: Math.random() * 100,
-          y: Math.random() * 100,
-          size: Math.random() * 50 + 20,
-          speed: Math.random() * 2 + 1,
-          popped: false,
-        }));
-        updated.push(...newBubbles);
+    setBubbles((prev) => {
+      const updated = prev.map((b) => (b.id === id ? { ...b, popped: true } : b));
+
+      if (updated.filter((b) => !b.popped).length <= 3) {
+        generateBubbles(10);
       }
+
       return updated;
     });
+
     playPopSound();
 
-    // Add particles
     const numParticles = 5;
     const newParticles = Array.from({ length: numParticles }, (_, i) => ({
       id: Date.now() + i,
       x: x + Math.random() * 20 - 10,
       y: y + Math.random() * 20 - 10,
       vx: (Math.random() - 0.5) * 4,
-      vy: (Math.random() - 0.5) * 4,
+      vy: (Math.random() - 0.5) * 4
     }));
-    setParticles(prev => [...prev, ...newParticles]);
 
-    // Remove particles after animation
+    setParticles((prev) => [...prev, ...newParticles]);
+
     setTimeout(() => {
-      setParticles(prev => prev.filter(p => !newParticles.some(np => np.id === p.id)));
+      setParticles((prev) => prev.filter((p) => !newParticles.some((np) => np.id === p.id)));
     }, 1000);
   };
 
@@ -82,18 +76,20 @@ const BubblePopper = () => {
       <div className="absolute top-2 left-2 text-white text-sm font-medium bg-black/20 px-2 py-1 rounded">
         Click bubbles to pop them
       </div>
-      {bubbles.map(bubble => (
+
+      {/* BUBBLES */}
+      {bubbles.map((bubble) => (
         <motion.div
           key={bubble.id}
-          initial={{ x: `${bubble.x}%`, y: `${bubble.y}%`, scale: 0 }}
+          initial={{ scale: 0 }}
           animate={
             bubble.popped
               ? { scale: 0, opacity: 0 }
               : {
-                  y: [`${bubble.y}%`, `${bubble.y - 10}%`, `${bubble.y}%`],
-                  x: [`${bubble.x}%`, `${bubble.x + 5}%`, `${bubble.x}%`],
                   scale: 1,
                   opacity: 1,
+                  y: [0, -10, 0],
+                  x: [0, 5, 0]
                 }
           }
           transition={
@@ -101,13 +97,15 @@ const BubblePopper = () => {
               ? { duration: 0.3 }
               : {
                   y: { duration: bubble.speed, repeat: Infinity, ease: 'easeInOut' },
-                  x: { duration: bubble.speed * 1.5, repeat: Infinity, ease: 'easeInOut' },
+                  x: { duration: bubble.speed * 1.5, repeat: Infinity, ease: 'easeInOut' }
                 }
           }
           className="absolute rounded-full bg-white/70 border border-white/50 cursor-pointer hover:bg-white/90 transition-colors"
           style={{
             width: bubble.size,
             height: bubble.size,
+            left: `${bubble.left}%`,
+            top: `${bubble.top}%`
           }}
           onClick={(e) => {
             const rect = e.currentTarget.parentElement.getBoundingClientRect();
@@ -117,7 +115,9 @@ const BubblePopper = () => {
           }}
         />
       ))}
-      {particles.map(particle => (
+
+      {/* PARTICLES */}
+      {particles.map((particle) => (
         <motion.div
           key={particle.id}
           initial={{ x: particle.x, y: particle.y, scale: 1, opacity: 1 }}
@@ -125,7 +125,7 @@ const BubblePopper = () => {
             x: particle.x + particle.vx * 10,
             y: particle.y + particle.vy * 10,
             scale: 0,
-            opacity: 0,
+            opacity: 0
           }}
           transition={{ duration: 1, ease: 'easeOut' }}
           className="absolute w-2 h-2 bg-white rounded-full"
