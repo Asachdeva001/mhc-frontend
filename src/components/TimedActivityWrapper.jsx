@@ -174,7 +174,7 @@ export default function TimedActivityWrapper({
   const progressPercent = totalTime > 0 ? ((totalTime - timeRemaining) / totalTime) * 100 : 0;
 
   return (
-    <div className="w-full flex flex-col items-center justify-center h-full gap-4">
+    <div className="w-full flex flex-col items-center justify-center min-h-[400px] gap-6 px-4">
       {/* Initial Duration Input */}
       {showInitialInput && (
         <motion.div
@@ -208,26 +208,39 @@ export default function TimedActivityWrapper({
       {/* Single Timer Display (Only when duration is set) */}
       {durationSet && !showRestartInput && (
         <motion.div
-          className="flex justify-center"
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
+          className="flex justify-center mb-4"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ type: 'spring', stiffness: 200 }}
         >
-          <div className="text-5xl font-bold text-teal-600 tabular-nums">
-            {formatTime(timeRemaining)}
+          <div className="bg-gradient-to-br from-white/60 to-white/40 backdrop-blur-xl rounded-3xl px-10 py-6 border-2 border-white/60 shadow-2xl">
+            <div className="text-6xl sm:text-7xl font-bold bg-gradient-to-r from-sanctuary-sage to-teal-600 bg-clip-text text-transparent tabular-nums font-nunito">
+              {formatTime(timeRemaining)}
+            </div>
+            <div className="text-center mt-2 text-sm font-medium text-sanctuary-slate/60 font-quicksand uppercase tracking-wider">
+              Time Remaining
+            </div>
           </div>
         </motion.div>
       )}
 
       {/* Progress Bar */}
       {durationSet && !showRestartInput && (
-        <div className="w-full max-w-sm px-4">
-          <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
-            <motion.div
-              className="h-full bg-gradient-to-r from-teal-400 to-sky-500"
-              initial={{ width: 0 }}
-              animate={{ width: `${progressPercent}%` }}
-              transition={{ duration: 0.3, ease: 'linear' }}
-            />
+        <div className="w-full max-w-md px-4">
+          <div className="relative">
+            <div className="h-3 bg-sanctuary-misty/30 rounded-full overflow-hidden backdrop-blur-sm border border-white/40 shadow-inner">
+              <motion.div
+                className="h-full bg-gradient-to-r from-sanctuary-sage via-teal-500 to-teal-600 shadow-lg"
+                initial={{ width: 0 }}
+                animate={{ width: `${progressPercent}%` }}
+                transition={{ duration: 0.5, ease: 'easeOut' }}
+              />
+            </div>
+            <div className="flex justify-between mt-2 text-xs font-medium text-sanctuary-slate/60 font-quicksand">
+              <span>Started</span>
+              <span>{Math.round(progressPercent)}%</span>
+              <span>Complete</span>
+            </div>
           </div>
         </div>
       )}
@@ -248,26 +261,27 @@ export default function TimedActivityWrapper({
       {/* Control Buttons (only when duration is set) */}
       {durationSet && !showInitialInput && !showRestartInput && (
         <motion.div
-          className="flex gap-3 justify-center"
+          className="flex flex-wrap gap-3 justify-center mt-4"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
         >
           {/* Pause / Resume Button */}
           <motion.button
             onClick={isPaused ? handleResume : handlePause}
-            className="flex items-center gap-2 px-5 py-2 bg-teal-500 hover:bg-teal-600 text-white font-semibold rounded-full transition-all duration-200 transform hover:scale-105 text-sm"
-            whileHover={{ scale: 1.05 }}
+            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-sanctuary-sage to-teal-600 hover:from-teal-600 hover:to-sanctuary-sage text-white font-bold rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl font-quicksand backdrop-blur-sm"
+            whileHover={{ scale: 1.05, y: -2 }}
             whileTap={{ scale: 0.95 }}
           >
             {isPaused ? (
               <>
-                <Play size={18} />
-                Resume
+                <Play size={20} fill="currentColor" />
+                <span className="text-base">Resume</span>
               </>
             ) : (
               <>
-                <Pause size={18} />
-                Pause
+                <Pause size={20} fill="currentColor" />
+                <span className="text-base">Pause</span>
               </>
             )}
           </motion.button>
@@ -275,12 +289,12 @@ export default function TimedActivityWrapper({
           {/* Restart Button */}
           <motion.button
             onClick={() => setShowRestartInput(true)}
-            className="flex items-center gap-2 px-5 py-2 bg-amber-500 hover:bg-amber-600 text-white font-semibold rounded-full transition-all duration-200 transform hover:scale-105 text-sm"
-            whileHover={{ scale: 1.05 }}
+            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-400 to-orange-500 hover:from-orange-500 hover:to-amber-400 text-white font-bold rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl font-quicksand backdrop-blur-sm"
+            whileHover={{ scale: 1.05, y: -2 }}
             whileTap={{ scale: 0.95 }}
           >
-            <RotateCcw size={18} />
-            Restart
+            <RotateCcw size={20} />
+            <span className="text-base">Restart</span>
           </motion.button>
         </motion.div>
       )}

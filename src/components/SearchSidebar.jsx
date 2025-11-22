@@ -128,7 +128,7 @@ export const SearchSidebar = ({
                             <pre className="whitespace-pre-wrap">{typeof apiDebug.lastError === 'string' ? apiDebug.lastError : JSON.stringify(apiDebug.lastError, null, 2)}</pre>
                         </div>
                     )}
-                    <div className="mt-2 text-slate-500 text-[11px]">Tip: set `NEXT_PUBLIC_API_BASE_URL` if your backend runs on a different port.</div>
+                    <div className="mt-2 text-slate-500 text-[11px]">Tip: set `NEXT_PUBLIC_API_URL` if your backend runs on a different port.</div>
                 </div>
             )}
         </div>

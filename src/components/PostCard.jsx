@@ -8,7 +8,7 @@ import axios from 'axios';
 import { renderContentWithTags, getAvatarInitials } from '../lib/communityUtils';
 import { CommentItem } from './CommentItem';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || '';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || '';
 
 const api = axios.create({
     baseURL: API_BASE || undefined,

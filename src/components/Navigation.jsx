@@ -5,11 +5,12 @@ import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../lib/authContext';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LayoutDashboard, MessageSquare, PlusCircle, Gamepad2, Leaf, LogOut, ChevronDown, Menu, X, HandMetal } from 'lucide-react';
+import { LayoutDashboard, MessageSquare, PlusCircle, BookOpen, Gamepad2, Leaf, LogOut, ChevronDown, Menu, X, HandMetal, User, Shield, Info } from 'lucide-react';
 
 const navLinks = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, pageName: 'dashboard' },
   { href: '/chat', label: 'Chat', icon: MessageSquare, pageName: 'chat' },
+  { href: '/journal', label: 'Journal', icon: BookOpen, pageName: 'journal' },
   { href: '/activities', label: 'Activities', icon: PlusCircle, pageName: 'activities' },
   { href: '/anti-stress-games', label: 'Games', icon: Gamepad2, pageName: 'anti-stress-games' },
   { href: '/community', label: 'Community', icon: HandMetal, pageName: 'community' },
@@ -151,7 +152,7 @@ export default function Navigation({ currentPage = '' }) {
                         <Link
                           href="/settings?tab=profile"
                           onClick={() => setShowUserMenu(false)}
-                          className="w-full flex items-center space-x-2 text-left px-4 py-2 text-sm text-sanctuary-slate hover:bg-sanctuary-misty/30 transition-sanctuary"
+                          className={`w-full flex items-center space-x-2 text-left px-4 py-2 text-sm transition-colors ${theme.dropdownTextMain} ${theme.dropdownHover}`}
                         >
                           <User size={14} />
                           <span>My Profile</span>
@@ -159,7 +160,7 @@ export default function Navigation({ currentPage = '' }) {
                         <Link
                           href="/settings?tab=data"
                           onClick={() => setShowUserMenu(false)}
-                          className="w-full flex items-center space-x-2 text-left px-4 py-2 text-sm text-sanctuary-slate hover:bg-sanctuary-misty/30 transition-sanctuary"
+                          className={`w-full flex items-center space-x-2 text-left px-4 py-2 text-sm transition-colors ${theme.dropdownTextMain} ${theme.dropdownHover}`}
                         >
                           <Shield size={14} />
                           <span>Data & Privacy</span>
@@ -167,7 +168,7 @@ export default function Navigation({ currentPage = '' }) {
                         <Link
                           href="/about"
                           onClick={() => setShowUserMenu(false)}
-                          className="w-full flex items-center space-x-2 text-left px-4 py-2 text-sm text-sanctuary-slate hover:bg-sanctuary-misty/30 transition-sanctuary border-b border-sanctuary-misty/30"
+                          className={`w-full flex items-center space-x-2 text-left px-4 py-2 text-sm transition-colors border-b ${theme.dropdownTextMain} ${theme.dropdownHover} ${isCommunity ? 'border-slate-800' : 'border-slate-100'}`}
                         >
                           <Info size={14} />
                           <span>Know More</span>

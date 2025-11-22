@@ -17,7 +17,7 @@ import {
 } from '../../lib/communityUtils';
 
 // Setup axios instance
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || '';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || '';
 const DEBUG_API = process.env.NEXT_PUBLIC_DEBUG_API === 'true';
 
 const api = axios.create({
@@ -132,7 +132,7 @@ export default function CommunityPage() {
 
             let errorMessage = err.response?.data?.error || 'Could not load community posts. Please try again.';
             if (status === 404) {
-                errorMessage = `API returned 404 for ${url}. Ensure your backend is running and/or set NEXT_PUBLIC_API_BASE_URL to your backend address (e.g. http://localhost:5000).`;
+                errorMessage = `API returned 404 for ${url}. Ensure your backend is running and/or set NEXT_PUBLIC_API_URL to your backend address (e.g. http://localhost:5000).`;
             }
             setInlineError(errorMessage);
         } finally {
@@ -192,7 +192,7 @@ export default function CommunityPage() {
             const url = error.config?.url || '/api/posts';
             setApiDebug((d) => ({ ...d, lastUrl: url, lastStatus: status || null, lastError: error.response?.data || error.message }));
             const errorMessage = status === 404
-                ? `Post endpoint not found (404). Check NEXT_PUBLIC_API_BASE_URL and that your backend is running.`
+                ? `Post endpoint not found (404). Check NEXT_PUBLIC_API_URL and that your backend is running.`
                 : (error.response?.data?.error || "Could not create post. Try again.");
             setInlineError(errorMessage);
         }
