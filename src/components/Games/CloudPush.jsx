@@ -109,7 +109,7 @@ const CloudPush = () => {
         animate={{ y: [0, -5, 0] }}
         transition={{ duration: 3, repeat: Infinity }}
       >
-        Push the clouds gently 🌤️
+        Push the clouds gently 🌤
       </motion.div>
 
       <div className="absolute top-4 right-4 text-white/70 text-xs">
