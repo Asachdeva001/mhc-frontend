@@ -207,25 +207,7 @@ export const api = {
           completed: false,
         },
         {
-          id: 'gratitude-journal',
-          title: 'Gratitude Journaling',
-          description: 'Write down three things you are grateful for today',
-          duration: '10 minutes',
-          category: 'Reflection',
-          difficulty: 'Easy',
-          completed: false,
-        },
-        {
-          id: 'walk-outside',
-          title: 'Take a Walk Outside',
-          description: 'Get some fresh air and gentle movement',
-          duration: '15 minutes',
-          category: 'Physical',
-          difficulty: 'Easy',
-          completed: false,
-        },
-        {
-          id: 'guided-meditation',
+          id: 'meditation',
           title: 'Guided Meditation',
           description: 'Listen to a calming meditation session',
           duration: '10 minutes',
@@ -233,8 +215,57 @@ export const api = {
           difficulty: 'Medium',
           completed: false,
         },
+        {
+          id: 'doodle',
+          title: 'Free-form Doodling',
+          description: 'Let your creativity flow with simple drawing',
+          duration: '10 minutes',
+          category: 'Creative',
+          difficulty: 'Easy',
+          completed: false,
+        },
+        {
+          id: 'music-listening',
+          title: 'Music Therapy',
+          description: 'Listen to music that matches or improves your mood',
+          duration: '15 minutes',
+          category: 'Creative',
+          difficulty: 'Easy',
+          completed: false,
+        },
+        {
+          id: 'stretching',
+          title: 'Gentle Stretching',
+          description: 'Release tension with simple stretches',
+          duration: '10 minutes',
+          category: 'Physical',
+          difficulty: 'Easy',
+          completed: false,
+        },
+        {
+          id: 'dance-break',
+          title: 'Dance Break',
+          description: 'Put on your favorite song and move your body',
+          duration: '5 minutes',
+          category: 'Physical',
+          difficulty: 'Easy',
+          completed: false,
+        },
       ];
       return allActivities;
+    },
+    
+    // Save activity session state (auto-save during activity)
+    saveActivitySession: async (sessionData) => {
+      return apiCall('/api/activities/session/save', {
+        method: 'POST',
+        body: JSON.stringify(sessionData),
+      });
+    },
+
+    // Retrieve latest activity session
+    getActivitySession: async (activityId) => {
+      return apiCall(`/api/activities/session/${activityId}`);
     },
     
     completeActivity: async (activityId, notes = '') => {

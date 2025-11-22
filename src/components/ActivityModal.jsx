@@ -4,6 +4,15 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Wind } from 'lucide-react';
 
+// Import activity-specific components
+import BreathingExercise from './activities/BreathingExercise';
+import Meditation from './activities/Meditation';
+import Doodle from './activities/Doodle';
+import MusicListening from './activities/MusicListening';
+import Stretching from './activities/Stretching';
+import DanceBreak from './activities/DanceBreak';
+import TimedActivityWrapper from './TimedActivityWrapper';
+
 // --- Helper Data & Functions ---
 const PREP_STEPS = [
   "Take a moment to settle in.",
@@ -18,9 +27,24 @@ const formatTime = (seconds) => {
   return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 };
 
+// --- Victory Animation Component ---
+const VictoryAnimation = ({ onComplete, onClose, activityId }) => {
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      // First record the activity completion, then close
+      if (onComplete) {
+        onComplete(activityId);
+      }
+      // Immediately close to show victory screen clearly
+      setTimeout(() => {
+        if (onClose) {
+          onClose();
+        }
+      }, 50); // Reduced from 100ms for faster close
+    }, 3500); // Reduced from 4000ms to show victory longer relative to screen
+    return () => clearTimeout(timer);
+  }, [onComplete, onClose, activityId]);
 
-// --- The Breathing Animation Component ---
-const BreathingAnimation = ({ children }) => {
   return (
     <div className="relative w-64 h-64 flex items-center justify-center">
       {/* Outer pulsing glow */}
@@ -45,60 +69,66 @@ const BreathingAnimation = ({ children }) => {
   );
 };
 
+// Define which activities use TimedActivityWrapper
+const TIMED_ACTIVITIES = ['breathing-exercise', 'meditation', 'music-listening', 'dance-break', 'stretching'];
+const ACTIVITY_DEFAULTS = {
+  'breathing-exercise': { duration: 300, prepPhase: true },     // 5 minutes
+  'meditation': { duration: 300, prepPhase: true },              // 5 minutes (default)
+  'music-listening': { duration: 300, prepPhase: false },        // 5 minutes (default)
+  'dance-break': { duration: 300, prepPhase: false },            // 5 minutes
+  'stretching': { duration: 300, prepPhase: false },             // 5 minutes
+  'doodle': { duration: 0, prepPhase: false },
+};
 
 // --- Main Activity Modal Component ---
 export default function ActivityModal({ activity, onComplete, onClose }) {
-  const [phase, setPhase] = useState('prepare'); // 'prepare', 'active'
-  const [prepStepIndex, setPrepStepIndex] = useState(0);
-  
-  // Using your original logic to parse duration
-  const durationInSeconds = (() => {
-    const match = activity?.duration?.match(/(\d+)/);
-    return match ? Number(match[1]) * 60 : 300; // Default to 5 mins if parse fails
-  })();
-  
-  const [timeRemaining, setTimeRemaining] = useState(durationInSeconds);
+  const isTimed = TIMED_ACTIVITIES.includes(activity.id);
+  const showPrepPhase = isTimed && ACTIVITY_DEFAULTS[activity.id]?.prepPhase;
+  const defaultDuration = ACTIVITY_DEFAULTS[activity.id]?.duration || 300;
 
-  // Effect for the preparation phase instruction sequence
+  const [phase, setPhase] = useState(showPrepPhase ? 'prepare' : 'active'); // 'prepare', 'active'
+  const [prepStepIndex, setPrepStepIndex] = useState(0);
+  const [showVictory, setShowVictory] = useState(false);
+  
+  // Check if activity is incomplete (resuming from saved state)
+  const isResuming = activity.isIncomplete && activity.incompleteSavedState;
+  const savedState = isResuming ? activity.incompleteSavedState : null;
+
+  // Effect for the preparation phase instruction sequence (only for breathing & meditation)
   useEffect(() => {
+    if (!showPrepPhase) return;
     if (phase === 'prepare' && prepStepIndex < PREP_STEPS.length - 1) {
       const timer = setTimeout(() => {
         setPrepStepIndex(prepStepIndex + 1);
       }, 2000);
       return () => clearTimeout(timer);
     }
-  }, [phase, prepStepIndex]);
-  
-  // Effect for the main activity timer
-  useEffect(() => {
-    if (phase === 'active' && timeRemaining > 0) {
-      const interval = setInterval(() => {
-        setTimeRemaining(prev => prev - 1);
-      }, 1000);
-      return () => clearInterval(interval);
-    } else if (phase === 'active' && timeRemaining === 0) {
-      onComplete(activity.id);
+  }, [phase, prepStepIndex, showPrepPhase]);
+
+  // Handle close - no additional cleanup needed (TimedActivityWrapper or components handle it)
+  const handleClose = () => {
+    onClose();
+  };
+
+  // Handle completion with victory animation for timed activities
+  const handleActivityComplete = (activityId) => {
+    if (isTimed) {
+      setShowVictory(true);
+    } else {
+      // Non-timed activities complete immediately
+      onComplete(activityId);
       onClose();
     }
-  }, [phase, timeRemaining, activity.id, onComplete, onClose]);
-
-  // Effect for 'Escape' key press
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [onClose]);
+  };
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
-      onClick={onClose}
-    >
+    <>
+      <AnimatePresence>
+        {showVictory && (
+          <VictoryAnimation onComplete={onComplete} onClose={onClose} activityId={activity.id} />
+        )}
+      </AnimatePresence>
+      
       <motion.div
         initial={{ y: 20, opacity: 0, scale: 0.95 }}
         animate={{ y: 0, opacity: 1, scale: 1 }}
@@ -152,13 +182,59 @@ export default function ActivityModal({ activity, onComplete, onClose }) {
                     {formatTime(timeRemaining)}
                   </p>
                   <AnimatePresence mode="wait">
+                    <motion.p
+                      key={prepStepIndex}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.5 }}
+                      className="text-xl sm:text-2xl text-slate-600"
+                    >
+                      {PREP_STEPS[prepStepIndex]}
+                    </motion.p>
                   </AnimatePresence>
-                </BreathingAnimation>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+                  {prepStepIndex === PREP_STEPS.length - 1 && (
+                    <motion.button
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 1 }}
+                      onClick={() => setPhase('active')}
+                      className="mt-8 bg-gradient-to-r from-teal-500 to-sky-600 text-white font-bold py-2 px-6 sm:py-3 sm:px-8 rounded-full transition-all duration-200 transform hover:scale-105 hover:shadow-lg text-sm sm:text-base"
+                    >
+                      Begin
+                    </motion.button>
+                  )}
+                </motion.div>
+              ) : (
+                // Non-timed activities (doodle, etc.)
+                <motion.div key="active" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                  {getActivityComponent(activity.id)}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </motion.div>
       </motion.div>
-    </motion.div>
+    </>
   );
+}
+
+// Helper to get activity component
+function getActivityComponent(activityId) {
+  switch (activityId) {
+    case 'breathing-exercise':
+      return BreathingExercise;
+    case 'meditation':
+      return Meditation;
+    case 'doodle':
+      return Doodle;
+    case 'music-listening':
+      return MusicListening;
+    case 'stretching':
+      return Stretching;
+    case 'dance-break':
+      return DanceBreak;
+    default:
+      return null;
+  }
 }
