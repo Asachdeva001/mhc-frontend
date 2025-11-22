@@ -23,17 +23,18 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const initAuth = async () => {
       try {
-        const storedToken = localStorage.getItem('authToken');
+        const storedToken = localStorage.getItem('mental_buddy_token');
         const storedUser = localStorage.getItem('user');
         
         if (storedToken && storedUser) {
           setToken(storedToken);
           setUser(JSON.parse(storedUser));
+          console.log('🔐 Existing session found');
         }
       } catch (error) {
         console.error('Auth initialization error:', error);
         // Clear invalid data
-        localStorage.removeItem('authToken');
+        localStorage.removeItem('mental_buddy_token');
         localStorage.removeItem('user');
         setToken(null);
         setUser(null);
@@ -54,8 +55,10 @@ export const AuthProvider = ({ children }) => {
         setUser(response.user);
         
         // Store in localStorage for persistence
-        localStorage.setItem('authToken', response.sessionToken);
+        localStorage.setItem('mental_buddy_token', response.sessionToken);
         localStorage.setItem('user', JSON.stringify(response.user));
+        
+        console.log('✅ Sign up successful, token saved:', response.sessionToken.substring(0, 20) + '...');
         
         return { success: true, user: response.user };
       }
@@ -75,9 +78,11 @@ export const AuthProvider = ({ children }) => {
         setToken(response.sessionToken);
         setUser(response.user);
         
-        // Store in localStorage for persistence
-        localStorage.setItem('authToken', response.sessionToken);
+        // Store in localStorage for persistence using the correct key
+        localStorage.setItem('mental_buddy_token', response.sessionToken);
         localStorage.setItem('user', JSON.stringify(response.user));
+        
+        console.log('✅ Sign in successful, token saved:', response.sessionToken.substring(0, 20) + '...');
         
         return { success: true, user: response.user };
       }
@@ -101,10 +106,10 @@ export const AuthProvider = ({ children }) => {
 
       // Generate new token by creating a new timestamp
       const newTimestamp = Date.now();
-      const newToken = Buffer.from(`${userData.uid}:${newTimestamp}`).toString('base64');
+      const newToken = btoa(`${userData.uid}:${newTimestamp}`);
       
       setToken(newToken);
-      localStorage.setItem('authToken', newToken);
+      localStorage.setItem('mental_buddy_token', newToken);
       
       console.log('✅ Token refreshed successfully');
       return newToken;
@@ -128,8 +133,10 @@ export const AuthProvider = ({ children }) => {
       setToken(null);
       
       // Clear auth localStorage
-      localStorage.removeItem('authToken');
+      localStorage.removeItem('mental_buddy_token');
       localStorage.removeItem('user');
+      
+      console.log('🔓 User signed out');
       
       return { success: true };
     } catch (error) {

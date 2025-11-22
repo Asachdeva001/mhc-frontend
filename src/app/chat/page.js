@@ -46,7 +46,15 @@ export default function ChatPage() {
       // Load saved messages after encryption is ready
       await loadSavedMessages(password);
     } catch (error) {
-      console.error('Failed to initialize encryption:', error);
+      console.error('❌ Failed to initialize encryption:', error);
+      // Clear potentially corrupted data and start fresh
+      console.log('🔄 Clearing corrupted encryption data and starting fresh...');
+      try {
+        chatStorage.clearMessages(user.uid);
+        encryptionKeyStorage.removeKeyHash(user.uid);
+      } catch (clearError) {
+        console.error('Failed to clear corrupted data:', clearError);
+      }
       // Fallback: load messages without encryption
       await loadSavedMessages(null);
     } finally {
@@ -64,9 +72,15 @@ export default function ChatPage() {
       if (password && savedMessages && savedMessages.length > 0) {
         try {
           decryptedMessages = await messageEncryption.decryptMessages(savedMessages, password);
+          console.log('✅ Successfully decrypted', decryptedMessages.length, 'localStorage messages');
         } catch (decryptError) {
-          console.warn('Failed to decrypt localStorage messages:', decryptError);
-          decryptedMessages = savedMessages;
+          console.warn('⚠️ Failed to decrypt localStorage messages, using plain text:', decryptError.message);
+          // Try to extract plain text if messages are malformed
+          decryptedMessages = savedMessages.map(msg => ({
+            ...msg,
+            text: typeof msg.text === 'string' ? msg.text : 'Message unavailable',
+            encrypted: false
+          }));
         }
       }
 
@@ -90,10 +104,15 @@ export default function ChatPage() {
           if (password && backendMessages && backendMessages.length > 0) {
             try {
               backendMessages = await messageEncryption.decryptMessages(backendMessages, password);
+              console.log('✅ Successfully decrypted', backendMessages.length, 'backend messages');
             } catch (decryptError) {
-              console.warn('Failed to decrypt backend messages:', decryptError);
-              // Use encrypted messages as fallback
-              backendMessages = latestConversation.messages;
+              console.warn('⚠️ Failed to decrypt backend messages, using plain text:', decryptError.message);
+              // Try to extract plain text if messages are malformed
+              backendMessages = latestConversation.messages.map(msg => ({
+                ...msg,
+                text: typeof msg.text === 'string' ? msg.text : 'Message unavailable',
+                encrypted: false
+              }));
             }
           }
 
@@ -194,7 +213,8 @@ export default function ChatPage() {
       const aiResponse = {
         text: response.reply,
         sender: 'ai',
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        buttons: response.buttons || undefined // Include buttons if provided
       };
 
       const finalMessages = [...updatedMessages, aiResponse];
@@ -236,7 +256,7 @@ export default function ChatPage() {
         await api.chat.saveConversation(finalMessages, sessionId);
       }
     } finally {
-      setIsAiTyping(false);
+      setIsLoading(false);
     }
   };
 

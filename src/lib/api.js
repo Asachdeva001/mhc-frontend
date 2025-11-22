@@ -13,7 +13,7 @@ const refreshAuthToken = async () => {
     const newTimestamp = Date.now();
     const newToken = btoa(`${userData.uid}:${newTimestamp}`);
     
-    localStorage.setItem('authToken', newToken);
+    localStorage.setItem('mental_buddy_token', newToken);
     console.log('🔄 Token refreshed successfully');
     return newToken;
   } catch (error) {
@@ -34,12 +34,19 @@ const apiCall = async (endpoint, options = {}, isRetry = false) => {
 
   // Add authorization header if token exists
   if (typeof window !== 'undefined') {
-    const token = localStorage.getItem('authToken');
+    const token = localStorage.getItem('mental_buddy_token');
     if (token) {
       defaultOptions.headers.Authorization = `Bearer ${token}`;
-      console.log('🔑 Using auth token for API call to:', endpoint);
+      console.log('🔑 Sending Token:', token.substring(0, 20) + '... (length: ' + token.length + ')');
+      console.log('🌐 API call to:', endpoint);
     } else {
       console.log('⚠️ No auth token found for API call to:', endpoint);
+      // If no token and not a public endpoint, redirect to signin
+      if (!endpoint.includes('/signin') && !endpoint.includes('/signup')) {
+        console.error('❌ Missing token - redirecting to signin');
+        window.location.href = '/auth/signin';
+        throw new Error('Authentication required');
+      }
     }
   }
 
@@ -66,7 +73,7 @@ const apiCall = async (endpoint, options = {}, isRetry = false) => {
       } catch (refreshError) {
         console.error('❌ Token refresh failed, redirecting to signin');
         // Clear auth data and redirect
-        localStorage.removeItem('authToken');
+        localStorage.removeItem('mental_buddy_token');
         localStorage.removeItem('user');
         if (typeof window !== 'undefined') {
           window.location.href = '/auth/signin';
@@ -237,6 +244,46 @@ export const api = {
     
     getActivityHistory: async (days = 7) => {
       return apiCall(`/api/activities/history?days=${days}`);
+    },
+  },
+
+  // User settings endpoints
+  user: {
+    getProfile: async () => {
+      return apiCall('/api/user/profile');
+    },
+    
+    updateProfile: async (profileData) => {
+      return apiCall('/api/user/profile', {
+        method: 'PUT',
+        body: JSON.stringify(profileData),
+      });
+    },
+    
+    updatePassword: async (newPassword) => {
+      return apiCall('/api/user/password', {
+        method: 'PUT',
+        body: JSON.stringify({ newPassword }),
+      });
+    },
+    
+    deleteConversations: async () => {
+      return apiCall('/api/user/conversations', {
+        method: 'DELETE',
+      });
+    },
+    
+    deleteJournals: async () => {
+      return apiCall('/api/user/journals', {
+        method: 'DELETE',
+      });
+    },
+    
+    deleteAccount: async (confirmEmail) => {
+      return apiCall('/api/user/account', {
+        method: 'DELETE',
+        body: JSON.stringify({ confirmEmail }),
+      });
     },
   },
 

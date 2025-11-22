@@ -148,6 +148,30 @@ export default function Navigation({ currentPage = '' }) {
                           <p className={`text-sm font-semibold truncate ${theme.dropdownTextMain}`}>{user?.name}</p>
                           <p className={`text-xs truncate ${theme.dropdownTextSub}`}>{user?.email}</p>
                         </div>
+                        <Link
+                          href="/settings?tab=profile"
+                          onClick={() => setShowUserMenu(false)}
+                          className="w-full flex items-center space-x-2 text-left px-4 py-2 text-sm text-sanctuary-slate hover:bg-sanctuary-misty/30 transition-sanctuary"
+                        >
+                          <User size={14} />
+                          <span>My Profile</span>
+                        </Link>
+                        <Link
+                          href="/settings?tab=data"
+                          onClick={() => setShowUserMenu(false)}
+                          className="w-full flex items-center space-x-2 text-left px-4 py-2 text-sm text-sanctuary-slate hover:bg-sanctuary-misty/30 transition-sanctuary"
+                        >
+                          <Shield size={14} />
+                          <span>Data & Privacy</span>
+                        </Link>
+                        <Link
+                          href="/about"
+                          onClick={() => setShowUserMenu(false)}
+                          className="w-full flex items-center space-x-2 text-left px-4 py-2 text-sm text-sanctuary-slate hover:bg-sanctuary-misty/30 transition-sanctuary border-b border-sanctuary-misty/30"
+                        >
+                          <Info size={14} />
+                          <span>Know More</span>
+                        </Link>
                         <button
                           onClick={handleSignOut}
                           className={`w-full flex items-center space-x-2 text-left px-4 py-2 text-sm text-red-500 transition-colors ${theme.dropdownHover}`}
@@ -192,7 +216,7 @@ export default function Navigation({ currentPage = '' }) {
                       key={link.href}
                       href={link.href}
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className={`flex items-center space-x-3 px-3 py-2 rounded-lg text-base font-medium transition-colors ${
+                      className={`flex items-center space-x-3 px-3 py-2 rounded-3xl text-base font-medium transition-sanctuary touch-target ${
                         currentPage === link.pageName
                           ? theme.activeLink
                           : `${theme.text} ${theme.textHover}`

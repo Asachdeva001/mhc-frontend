@@ -99,7 +99,7 @@ export default function ActivitiesPage() {
 
   return (
     <>
-      <div className="min-h-screen bg-gradient-to-br from-sky-50 via-slate-50 to-violet-50">
+      <div className="min-h-screen bg-sanctuary-sand">
         <Navigation currentPage="activities" />
 
         <motion.main
@@ -114,20 +114,20 @@ export default function ActivitiesPage() {
                 initial={{ y: -20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 exit={{ y: -20, opacity: 0 }}
-                className="mb-6 p-4 bg-red-100 border border-red-300 rounded-2xl flex items-center justify-between shadow-sm"
+                className="mb-6 p-4 bg-red-50 border border-red-200 rounded-3xl flex items-center justify-between shadow-sanctuary"
               >
                 <div className="flex items-center">
-                  <AlertTriangle className="h-5 w-5 text-red-600 mr-3" />
-                  <span className="text-red-800 font-medium">{error}</span>
+                  <AlertTriangle className="h-5 w-5 text-red-500 mr-3" />
+                  <span className="text-red-700 font-quicksand font-medium">{error}</span>
                 </div>
-                <button onClick={() => setError('')} className="text-red-600 hover:text-red-800"><X size={20} /></button>
+                <button onClick={() => setError('')} className="text-red-500 hover:text-red-700 transition-sanctuary"><X size={20} /></button>
               </motion.div>
             )}
           </AnimatePresence>
 
           <header className="mb-8">
-            <h1 className="text-4xl font-bold text-slate-800">Your Daily Wellness</h1>
-            <p className="text-slate-500 mt-1">Select an activity to begin your mindful moment.</p>
+            <h1 className="text-4xl font-bold text-sanctuary-slate font-quicksand">Your Daily Wellness</h1>
+            <p className="text-sanctuary-slate/70 mt-1 font-nunito">Select an activity to begin your mindful moment.</p>
           </header>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
@@ -137,7 +137,7 @@ export default function ActivitiesPage() {
             
             <div className="lg:col-span-2">
                 {dataLoading ? (
-                    <div className="flex justify-center items-center h-64 bg-white/60 backdrop-blur-lg rounded-2xl"><Loader2 className="h-8 w-8 animate-spin text-teal-600"/></div>
+                    <div className="flex justify-center items-center h-64 neumorphic rounded-3xl"><Loader2 className="h-8 w-8 animate-spin text-sanctuary-sage"/></div>
                 ) : activities.length > 0 ? (
                     <motion.div 
                         className="grid grid-cols-2 md:grid-cols-3 gap-6"
@@ -181,42 +181,42 @@ const ActivityProgress = ({ completed, total }) => {
     const percentage = total > 0 ? (completed / total) * 100 : 0;
     
     return(
-        <motion.div layout className="bg-white/60 backdrop-blur-lg rounded-2xl shadow-sm border border-slate-200/80 p-6">
-            <h2 className="text-xl font-semibold text-slate-800 mb-4">Today's Progress</h2>
+        <motion.div layout className="neumorphic rounded-3xl p-6">
+            <h2 className="text-xl font-semibold text-sanctuary-slate mb-4 font-quicksand">Today's Progress</h2>
             <div className="space-y-4">
-                <div className="w-full bg-slate-200 rounded-full h-2.5">
+                <div className="w-full bg-sanctuary-misty/40 rounded-full h-2.5">
                     <motion.div
-                        className="bg-gradient-to-r from-teal-400 to-sky-500 h-2.5 rounded-full"
+                        className="bg-gradient-to-r from-sanctuary-sage to-[#52796F] h-2.5 rounded-full"
                         initial={{ width: 0 }}
                         animate={{ width: `${percentage}%` }}
                         transition={{ duration: 0.8, ease: "easeInOut" }}
                     />
                 </div>
-                <div className="flex justify-between text-sm font-medium text-slate-600">
+                <div className="flex justify-between text-sm font-medium text-sanctuary-slate/80 font-nunito">
                     <span>{completed}/{total} Completed</span>
                     <span>{Math.round(percentage)}%</span>
                 </div>
             </div>
             <div className="mt-6 space-y-3">
-                 <InsightCard icon={CheckCircle} title="Completed" value={`${completed} Activities`} color="text-emerald-600" />
-                 <InsightCard icon={ListTodo} title="Remaining" value={`${total - completed} Activities`} color="text-amber-600" />
+                 <InsightCard icon={CheckCircle} title="Completed" value={`${completed} Activities`} color="text-sanctuary-sage" />
+                 <InsightCard icon={ListTodo} title="Remaining" value={`${total - completed} Activities`} color="text-[#52796F]" />
             </div>
         </motion.div>
     );
 };
 
 const InsightCard = ({ icon: Icon, title, value, color }) => (
-  <div className="flex items-center space-x-4 bg-slate-50/80 p-3 rounded-xl border border-slate-200/60">
-    <div className={`p-2 rounded-full bg-white ${color}`}><Icon size={18} /></div>
+  <div className="flex items-center space-x-4 bg-sanctuary-sand rounded-3xl border border-sanctuary-misty/30 p-3 shadow-sanctuary">
+    <div className={`p-2 rounded-full bg-white shadow-sanctuary ${color}`}><Icon size={18} /></div>
     <div>
-      <h3 className="text-sm text-slate-600">{title}</h3>
+      <h3 className="text-sm text-sanctuary-slate/70 font-nunito">{title}</h3>
       <p className={`text-lg font-bold ${color}`}>{value}</p>
     </div>
   </div>
 );
 
 const EmptyState = ({ message }) => (
-  <div className="text-center py-20 bg-white/60 backdrop-blur-lg rounded-2xl shadow-sm border border-slate-200/80">
-      <p className="text-slate-500">{message}</p>
+  <div className="text-center py-20 neumorphic rounded-3xl">
+      <p className="text-sanctuary-slate/70 font-nunito">{message}</p>
   </div>
 );
