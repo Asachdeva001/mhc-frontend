@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2, AlertTriangle, X, CheckCircle, ListTodo } from 'lucide-react';
@@ -8,6 +8,7 @@ import { Loader2, AlertTriangle, X, CheckCircle, ListTodo } from 'lucide-react';
 import Navigation from '../../components/Navigation';
 import ActivityCard from '../../components/ActivityCard';
 import ActivityModal from '../../components/ActivityModal';
+import DoodleCanvas from '../../components/DoodleCanvas';
 import { api } from '../../lib/api';
 import { useAuth } from '../../lib/authContext';
 
@@ -42,6 +43,17 @@ export default function ActivitiesPage() {
   // State for managing the modal
   const [selectedActivity, setSelectedActivity] = useState(null);
 
+  // Local front-end activity definitions (6 activities remain after removing 5)
+  // All timed activities default to 5 minutes (300 seconds)
+  const localActivities = [
+    { id: 'breathing-exercise', title: '5-Minute Breathing Exercise', description: 'Practice deep breathing to reduce stress and anxiety', duration: '5 minutes', category: 'Breathing', difficulty: 'Easy', showDuration: true },
+    { id: 'meditation', title: 'Guided Meditation', description: 'Listen to a calming meditation session', duration: '5 minutes', category: 'Meditation', difficulty: 'Medium', showDuration: true },
+    { id: 'doodle', title: 'Free-form Doodling', description: 'Let your creativity flow with simple drawing', duration: '10 minutes', category: 'Creative', difficulty: 'Easy', showDuration: false },
+    { id: 'music-listening', title: 'Music Therapy', description: 'Listen to music that matches or improves your mood', duration: '5 minutes', category: 'Creative', difficulty: 'Easy', showDuration: true },
+    { id: 'stretching', title: 'Gentle Stretching', description: 'Release tension with simple stretches', duration: '5 minutes', category: 'Physical', difficulty: 'Easy', showDuration: true },
+    { id: 'dance-break', title: 'Dance Break', description: 'Put on your favorite song and move your body', duration: '5 minutes', category: 'Physical', difficulty: 'Easy', showDuration: true }
+  ];
+
   useEffect(() => {
     if (!authLoading) {
       if (!isAuthenticated) {
@@ -73,7 +85,8 @@ export default function ActivitiesPage() {
   };
   
   // This is called by the modal when the timer finishes
-  const handleActivityComplete = (activityId) => {
+  // Wrap in useCallback to prevent infinite re-renders
+  const handleActivityComplete = useCallback((activityId) => {
     activityStorage.addCompleted(activityId);
     setActivities(prev =>
       prev.map(activity =>
@@ -84,7 +97,49 @@ export default function ActivitiesPage() {
      api.activities.completeActivity(activityId).catch(err => {
         console.error("Failed to sync completion with server:", err);
      });
+  }, []);
+
+  // Always display all local activities
+  const completedIds = activityStorage.getCompleted();
+  
+  // Load incomplete activities from localStorage (activities that were paused/closed mid-way)
+  const getIncompleteActivities = () => {
+    if (typeof window === 'undefined') return new Map();
+    const today = new Date();
+    const todayKey = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
+    const incompleteMap = new Map();
+    
+    // Get all keys from localStorage
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.includes(`activity_incomplete_${todayKey}`)) {
+        try {
+          const data = JSON.parse(localStorage.getItem(key));
+          incompleteMap.set(data.id, data);
+        } catch (e) {
+          console.error('Failed to parse incomplete activity', e);
+        }
+      }
+    }
+    return incompleteMap;
   };
+  
+  const incompleteActivitiesMap = getIncompleteActivities();
+  
+  // Merge activities with incomplete status and saved state
+  const displayedActivities = localActivities.map(a => {
+    const incompleteData = incompleteActivitiesMap.get(a.id);
+    return {
+      ...a,
+      completed: completedIds.has(a.id),
+      isIncomplete: !!incompleteData, // Yellow card if incomplete
+      incompleteSavedState: incompleteData, // Store saved state for resuming
+    };
+  });
+  
+  const completedCount = displayedActivities.filter(a => a.completed).length;
+  const totalCount = displayedActivities.length;
+  
   
   if (authLoading || !isAuthenticated || !user) {
     return (
@@ -93,9 +148,6 @@ export default function ActivitiesPage() {
       </div>
     );
   }
-  
-  const completedCount = activities.filter(a => a.completed).length;
-  const totalCount = activities.length;
 
   return (
     <>
@@ -126,8 +178,10 @@ export default function ActivitiesPage() {
           </AnimatePresence>
 
           <header className="mb-8">
-            <h1 className="text-4xl font-bold text-slate-800">Your Daily Wellness</h1>
-            <p className="text-slate-500 mt-1">Select an activity to begin your mindful moment.</p>
+            <div>
+              <h1 className="text-4xl font-bold text-slate-800">Your Daily Wellness</h1>
+              <p className="text-slate-500 mt-1">Select an activity to begin your mindful moment.</p>
+            </div>
           </header>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
@@ -138,23 +192,23 @@ export default function ActivitiesPage() {
             <div className="lg:col-span-2">
                 {dataLoading ? (
                     <div className="flex justify-center items-center h-64 bg-white/60 backdrop-blur-lg rounded-2xl"><Loader2 className="h-8 w-8 animate-spin text-teal-600"/></div>
-                ) : activities.length > 0 ? (
-                    <motion.div 
-                        className="grid grid-cols-2 md:grid-cols-3 gap-6"
-                        variants={{ visible: { transition: { staggerChildren: 0.07 } } }}
-                        initial="hidden"
-                        animate="visible"
-                    >
-                        {activities.map(activity => (
-                            <ActivityCard
-                                key={activity.id}
-                                activity={activity}
-                                onStart={setSelectedActivity}
-                            />
-                        ))}
-                    </motion.div>
+                ) : displayedActivities.length > 0 ? (
+                  <motion.div 
+                    className="grid grid-cols-2 md:grid-cols-3 gap-6"
+                    variants={{ visible: { transition: { staggerChildren: 0.07 } } }}
+                    initial="hidden"
+                    animate="visible"
+                  >
+                    {displayedActivities.map(activity => (
+                      <ActivityCard
+                        key={activity.id}
+                        activity={activity}
+                        onStart={setSelectedActivity}
+                      />
+                    ))}
+                  </motion.div>
                 ) : (
-                    <EmptyState message="No activities for today. Check back tomorrow!" />
+                  <EmptyState message="No activities available." />
                 )}
             </div>
           </div>
@@ -163,13 +217,19 @@ export default function ActivitiesPage() {
 
       {/* Render the modal outside the main flow, controlled by state */}
       <AnimatePresence>
-        {selectedActivity && (
+        {selectedActivity && selectedActivity.id === 'doodle' ? (
+          <DoodleCanvas
+            activity={selectedActivity}
+            onClose={() => setSelectedActivity(null)}
+            onComplete={handleActivityComplete}
+          />
+        ) : selectedActivity ? (
           <ActivityModal
             activity={selectedActivity}
             onClose={() => setSelectedActivity(null)}
             onComplete={handleActivityComplete}
           />
-        )}
+        ) : null}
       </AnimatePresence>
     </>
   );
