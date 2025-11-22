@@ -1,15 +1,25 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import { Nunito, Quicksand, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "../lib/authContext";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+// Digital Sanctuary fonts - rounded and friendly
+const nunito = Nunito({
+  variable: "--font-nunito",
   subsets: ["latin"],
+  weight: ["300", "400", "600", "700"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const quicksand = Quicksand({
+  variable: "--font-quicksand",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+});
+
+// High-end serif font for journal entries
+const playfair = Playfair_Display({
+  variable: "--font-playfair",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
 export const metadata = {
@@ -21,7 +31,8 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${nunito.variable} ${quicksand.variable} ${playfair.variable} antialiased bg-sanctuary-sand`}
+        style={{ fontFamily: 'var(--font-nunito), sans-serif' }}
       >
         <AuthProvider>
           {children}
