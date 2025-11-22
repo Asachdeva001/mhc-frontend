@@ -98,27 +98,27 @@ export default function SignUpPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-50 to-cyan-50 p-6 relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center bg-sanctuary-sand p-6 relative overflow-hidden">
       
-      {/* Floating blurred blobs with the new theme */}
-      <div className="absolute top-20 left-10 w-72 h-72 bg-emerald-300/30 rounded-full blur-3xl animate-pulse" />
-      <div className="absolute bottom-20 right-10 w-80 h-80 bg-teal-300/20 rounded-full blur-3xl animate-pulse delay-2000" />
+      {/* Floating blurred blobs with sanctuary theme */}
+      <div className="absolute top-20 left-10 w-72 h-72 bg-sanctuary-sage/20 rounded-full blur-3xl animate-pulse" />
+      <div className="absolute bottom-20 right-10 w-80 h-80 bg-sanctuary-misty/30 rounded-full blur-3xl animate-pulse delay-2000" />
 
       <div className="max-w-md w-full relative z-10">
         <div className="text-center mb-6">
-          <Link href="/" className="inline-block bg-white/60 backdrop-blur-md text-emerald-800 font-semibold px-5 py-2 rounded-full text-sm hover:bg-white/80 transition shadow-sm mb-4">
+          <Link href="/" className="inline-block neumorphic text-sanctuary-slate font-semibold px-5 py-2 rounded-3xl text-sm hover:shadow-sanctuary-hover transition-sanctuary mb-4 font-quicksand">
             Back to Home
           </Link>
-          <h1 className="text-3xl font-extrabold text-gray-900">Create your account</h1>
+          <h1 className="text-3xl font-extrabold text-sanctuary-slate font-quicksand">Create your account</h1>
         </div>
 
-        <div className="bg-white/70 backdrop-blur-xl rounded-2xl shadow-xl p-8 border border-white/40">
+        <div className="neumorphic rounded-3xl p-8">
           {/* Progress tracker as dots */}
           <div className="flex justify-center gap-3 mb-8">
             {[1, 2, 3].map((i) => (
               <motion.div
                 key={i}
-                className={`h-3 w-3 rounded-full ${step >= i ? 'bg-emerald-600' : 'bg-gray-300'}`}
+                className={`h-3 w-3 rounded-full ${step >= i ? 'bg-sanctuary-sage shadow-sanctuary' : 'bg-sanctuary-misty/50'}`}
                 animate={{ scale: step === i ? 1.3 : 1 }}
                 transition={{ type: 'spring', stiffness: 200 }}
               />
@@ -130,11 +130,11 @@ export default function SignUpPage() {
               <AnimatePresence mode="wait">
                 {step === 1 && (
                   <motion.div key="step1" variants={stepVariants} initial="hidden" animate="visible" exit="exit">
-                    <h2 className="text-lg font-semibold text-gray-800 mb-4">What should we call you?</h2>
+                    <h2 className="text-lg font-semibold text-sanctuary-slate mb-4 font-quicksand">What should we call you?</h2>
                     <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"><FiUser /></span>
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sanctuary-slate/60"><FiUser /></span>
                       <input id="name" name="name" type="text" value={formData.name} onChange={handleInputChange} 
-                        className="w-full pl-10 text-gray-700 pr-3 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white/70 placeholder-gray-400"
+                        className="w-full pl-10 text-sanctuary-slate pr-3 py-3 rounded-3xl border border-sanctuary-misty/40 focus-sanctuary bg-white/90 placeholder:text-sanctuary-slate/40 font-nunito"
                         placeholder="Enter your name" autoFocus />
                     </div>
                   </motion.div>
@@ -142,11 +142,11 @@ export default function SignUpPage() {
 
                 {step === 2 && (
                   <motion.div key="step2" variants={stepVariants} initial="hidden" animate="visible" exit="exit">
-                    <h2 className="text-lg font-semibold text-gray-800 mb-4">What's your email?</h2>
+                    <h2 className="text-lg font-semibold text-sanctuary-slate mb-4 font-quicksand">What's your email?</h2>
                     <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"><FiMail /></span>
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sanctuary-slate/60"><FiMail /></span>
                       <input id="email" name="email" type="email" value={formData.email} onChange={handleInputChange} 
-                        className="w-full pl-10 pr-3 text-gray-700 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white/70 placeholder-gray-400"
+                        className="w-full pl-10 pr-3 text-sanctuary-slate py-3 rounded-3xl border border-sanctuary-misty/40 focus-sanctuary bg-white/90 placeholder:text-sanctuary-slate/40 font-nunito"
                         placeholder="you@example.com" autoFocus />
                     </div>
                   </motion.div>
@@ -154,18 +154,18 @@ export default function SignUpPage() {
 
                 {step === 3 && (
                   <motion.div key="step3" variants={stepVariants} initial="hidden" animate="visible" exit="exit">
-                    <h2 className="text-lg font-semibold text-gray-800 mb-4">Create a secure password</h2>
+                    <h2 className="text-lg font-semibold text-sanctuary-slate mb-4 font-quicksand">Create a secure password</h2>
                     <div className="space-y-4">
                       <div className="relative">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"><FiLock /></span>
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sanctuary-slate/60"><FiLock /></span>
                         <input id="password" name="password" type="password" value={formData.password} onChange={handleInputChange}
-                          className="w-full text-gray-700 pl-10 pr-3 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white/70 placeholder-gray-400"
+                          className="w-full text-sanctuary-slate pl-10 pr-3 py-3 rounded-3xl border border-sanctuary-misty/40 focus-sanctuary bg-white/90 placeholder:text-sanctuary-slate/40 font-nunito"
                           placeholder="Password (min. 6 characters)" autoFocus />
                       </div>
                       <div className="relative">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"><FiLock /></span>
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sanctuary-slate/60"><FiLock /></span>
                         <input id="confirmPassword" name="confirmPassword" type="password" value={formData.confirmPassword} onChange={handleInputChange}
-                          className="w-full text-gray-700 pl-10 pr-3 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white/70 placeholder-gray-400"
+                          className="w-full text-sanctuary-slate pl-10 pr-3 py-3 rounded-3xl border border-sanctuary-misty/40 focus-sanctuary bg-white/90 placeholder:text-sanctuary-slate/40 font-nunito"
                           placeholder="Confirm password" />
                       </div>
                     </div>
@@ -175,25 +175,25 @@ export default function SignUpPage() {
             </div>
 
             {error && (
-              <div className="flex items-center mt-4 p-3 bg-red-100 rounded-lg text-red-700 text-sm border border-red-200">
+              <div className="flex items-center mt-4 p-3 bg-red-50 rounded-3xl text-red-600 text-sm border border-red-200 font-nunito">
                 <FiAlertCircle className="mr-2" /> {error}
               </div>
             )}
 
             <div className="mt-8 flex items-center justify-between">
               <button type="button" onClick={handleBack}
-                className={`font-medium text-gray-600 hover:text-gray-900 transition ${step === 1 ? 'opacity-0 cursor-default' : 'opacity-100'}`}
+                className={`font-medium text-sanctuary-slate/70 hover:text-sanctuary-slate transition-sanctuary font-quicksand ${step === 1 ? 'opacity-0 cursor-default' : 'opacity-100'}`}
                 disabled={step === 1}>
                 Back
               </button>
               {step < TOTAL_STEPS ? (
                 <button type="button" onClick={handleNext}
-                  className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold py-2 px-6 rounded-xl shadow-md transition">
+                  className="bg-[#52796F] hover:bg-[#3d5a52] text-white font-semibold py-2 px-6 rounded-3xl shadow-sanctuary transition-sanctuary touch-target font-quicksand">
                   Next
                 </button>
               ) : (
                 <button type="submit" disabled={isLoading}
-                  className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold py-2 px-6 rounded-xl shadow-md transition flex items-center disabled:opacity-60">
+                  className="bg-[#52796F] hover:bg-[#3d5a52] text-white font-semibold py-2 px-6 rounded-3xl shadow-sanctuary transition-sanctuary flex items-center disabled:opacity-60 touch-target font-quicksand">
                   {isLoading ? (<><ImSpinner9 className="animate-spin mr-2" /> Creating...</>) : 'Create Account'}
                 </button>
               )}
@@ -202,9 +202,9 @@ export default function SignUpPage() {
         </div>
 
         <div className="mt-6 text-center">
-          <p className="text-sm text-gray-700">
+          <p className="text-sm text-sanctuary-slate/80 font-nunito">
             Already have an account?{' '}
-            <Link href="/auth/signin" className="font-semibold text-emerald-600 hover:text-emerald-800">Sign In</Link>
+            <Link href="/auth/signin" className="font-semibold text-[#52796F] hover:text-sanctuary-sage transition-sanctuary">Sign In</Link>
           </p>
         </div>
       </div>

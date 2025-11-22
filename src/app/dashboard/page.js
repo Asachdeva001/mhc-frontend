@@ -77,7 +77,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-slate-50 to-sky-50">
+    <div className="min-h-screen bg-sanctuary-sand">
       <Navigation currentPage="dashboard" />
 
       <motion.main
@@ -92,28 +92,28 @@ export default function DashboardPage() {
               initial={{ y: -20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: -20, opacity: 0 }}
-              className="mb-6 p-4 bg-red-100 border border-red-300 rounded-2xl flex items-center justify-between shadow-sm"
+              className="mb-6 p-4 bg-red-50 border border-red-200 rounded-3xl flex items-center justify-between shadow-sanctuary"
             >
               <div className="flex items-center">
-                <AlertTriangle className="h-5 w-5 text-red-600 mr-3" />
-                <span className="text-red-800 font-medium">{error}</span>
+                <AlertTriangle className="h-5 w-5 text-red-500 mr-3" />
+                <span className="text-red-700 font-quicksand font-medium">{error}</span>
               </div>
-              <button onClick={() => setError('')} className="text-red-600 hover:text-red-800"><X size={20} /></button>
+              <button onClick={() => setError('')} className="text-red-500 hover:text-red-700 transition-sanctuary"><X size={20} /></button>
             </motion.div>
           )}
         </AnimatePresence>
 
         <header className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="text-4xl font-bold text-slate-800">
+            <h1 className="text-4xl font-bold text-sanctuary-slate font-quicksand">
               {getGreeting()}, {user?.name?.split(' ')[0] || 'Friend'}!
             </h1>
-            <p className="text-slate-500 mt-1">Ready to check in with yourself?</p>
+            <p className="text-sanctuary-slate/70 mt-1 font-nunito">Ready to check in with yourself?</p>
           </div>
           <button
             onClick={loadDashboardData}
             disabled={dataLoading}
-            className="flex items-center space-x-2 px-4 py-2 bg-white text-slate-600 rounded-full shadow-sm hover:bg-slate-100 transition border border-slate-200 disabled:opacity-50"
+            className="flex items-center space-x-2 px-4 py-2 neumorphic text-sanctuary-slate rounded-3xl hover:shadow-sanctuary-hover transition-sanctuary touch-target disabled:opacity-50 font-quicksand"
           >
             {dataLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCcw className="h-4 w-4" />}
             <span>{dataLoading ? 'Refreshing...' : 'Refresh'}</span>
@@ -128,9 +128,9 @@ export default function DashboardPage() {
           </div>
 
           <div className="space-y-8 lg:col-span-2">
-            <motion.div layout className="bg-white/60 backdrop-blur-lg rounded-2xl shadow-sm border border-slate-200/80 p-6">
-              <h2 className="text-xl font-semibold text-slate-800 mb-1">Your 7-Day Mood Flow</h2>
-              <p className="text-slate-500 text-sm mb-4">See the patterns in your recent feelings.</p>
+            <motion.div layout className="neumorphic rounded-3xl p-6">
+              <h2 className="text-xl font-semibold text-sanctuary-slate mb-1 font-quicksand">Your 7-Day Mood Flow</h2>
+              <p className="text-sanctuary-slate/70 text-sm mb-4 font-nunito">See the patterns in your recent feelings.</p>
               {/* --- FIX: Added w-full and relative to constrain the chart --- */}
               <div className="h-64 w-full relative">
                 {chartData.length > 0 ? <MoodGraph data={chartData} /> : <EmptyState message="Log your mood to see your graph grow." />}
@@ -190,23 +190,23 @@ const DailyCheckin = ({ todayMood, onMoodLogged }) => {
 
   if (todayMood?.hasEntry && !showForm) {
     return (
-       <motion.div layout className="bg-white/60 backdrop-blur-lg rounded-2xl shadow-sm border border-slate-200/80 p-6 text-center">
-         <p className="text-lg font-semibold text-emerald-700">You've logged your mood today!</p>
+       <motion.div layout className="neumorphic rounded-3xl p-6 text-center">
+         <p className="text-lg font-semibold text-sanctuary-sage font-quicksand">You've logged your mood today!</p>
          <p className="text-4xl my-3">{moodOptions.find(o => o.mood >= todayMood.moodEntry.mood)?.emoji || '😊'}</p>
-         <p className="text-slate-600 italic">“{todayMood.moodEntry.note}”</p>
-         <button onClick={() => setShowForm(true)} className="mt-4 text-sm text-teal-600 hover:underline">Update Entry</button>
+         <p className="text-sanctuary-slate/80 italic font-nunito">"{todayMood.moodEntry.note}"</p>
+         <button onClick={() => setShowForm(true)} className="mt-4 text-sm text-[#52796F] hover:text-sanctuary-sage transition-sanctuary font-quicksand">Update Entry</button>
        </motion.div>
     );
   }
 
   return (
-    <motion.div layout className="bg-white/60 backdrop-blur-lg rounded-2xl shadow-sm border border-slate-200/80 p-6">
-      <h2 className="text-xl font-semibold text-slate-800 mb-4 text-center">How are you feeling now?</h2>
+    <motion.div layout className="neumorphic rounded-3xl p-6">
+      <h2 className="text-xl font-semibold text-sanctuary-slate mb-4 text-center font-quicksand">How are you feeling now?</h2>
       <div className="flex justify-around items-center mb-6">
         {moodOptions.map(({ mood, emoji }) => (
           <motion.button key={mood} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
             onClick={() => handleMoodSelect(mood)}
-            className={`text-3xl p-3 rounded-full transition ${newMood.level === mood && showForm ? 'bg-teal-100 ring-2 ring-teal-500' : 'hover:bg-slate-100'}`}
+            className={`text-3xl p-3 rounded-full transition-sanctuary ${newMood.level === mood && showForm ? 'bg-sanctuary-sage/20 ring-2 ring-sanctuary-sage shadow-sanctuary' : 'hover:bg-sanctuary-misty/30'}`}
           >
             {emoji}
           </motion.button>
@@ -230,14 +230,14 @@ const DailyCheckin = ({ todayMood, onMoodLogged }) => {
               <SliderInput label="Sleep" icon={Bed} min={0} max={12} value={newMood.sleep} onChange={(v) => setNewMood({ ...newMood, sleep: v })} color="bg-indigo-500" />
             </div>
             <textarea value={newMood.note} onChange={(e) => setNewMood({ ...newMood, note: e.target.value })}
-              placeholder="What’s contributing to this feeling?" rows="3" required
-              className="w-full text-gray-500 rounded-xl p-3 border transition bg-slate-50" />
+              placeholder="What's contributing to this feeling?" rows="3" required
+              className="w-full text-sanctuary-slate rounded-3xl p-3 border border-sanctuary-misty/40 transition-sanctuary bg-white/90 focus-sanctuary font-nunito placeholder:text-sanctuary-slate/40" />
             {error && <p className="text-sm text-red-600">{error}</p>}
             <div className="flex space-x-2 pt-2">
-              <button type="submit" disabled={isLoading} className="flex-1 bg-teal-600 hover:bg-teal-700 text-white font-semibold py-2 rounded-full transition flex items-center justify-center">
+              <button type="submit" disabled={isLoading} className="flex-1 bg-[#52796F] hover:bg-[#3d5a52] text-white font-semibold py-2 rounded-3xl transition-sanctuary flex items-center justify-center shadow-sanctuary touch-target font-quicksand">
                 {isLoading ? <Loader2 className="animate-spin h-5 w-5"/> : 'Save Entry'}
               </button>
-              <button type="button" onClick={() => setShowForm(false)} className="flex-1 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold py-2 rounded-full transition">Cancel</button>
+              <button type="button" onClick={() => setShowForm(false)} className="flex-1 bg-sanctuary-misty/50 hover:bg-sanctuary-misty text-sanctuary-slate font-semibold py-2 rounded-3xl transition-sanctuary touch-target font-quicksand">Cancel</button>
             </div>
           </motion.form>
         )}
@@ -247,19 +247,19 @@ const DailyCheckin = ({ todayMood, onMoodLogged }) => {
 };
 
 const Insights = ({ insights }) => (
-  <motion.div layout className="bg-white/60 backdrop-blur-lg rounded-2xl shadow-sm border border-slate-200/80 p-6">
-    <h2 className="text-xl font-semibold text-slate-800 mb-4">Your Insights</h2>
+  <motion.div layout className="neumorphic rounded-3xl p-6">
+    <h2 className="text-xl font-semibold text-sanctuary-slate mb-4 font-quicksand">Your Insights</h2>
     <div className="space-y-4">
-      <InsightCard icon={BarChart} title="7-Day Avg. Mood" value={insights ? `${insights.averageMood || 0}/10` : '...'} color="text-emerald-600" />
-      <InsightCard icon={Sparkles} title="Current Streak" value={insights ? `${insights.currentStreak || 0} days` : '...'} color="text-sky-600" />
-      <InsightCard icon={TrendingUp} title="Mood Trend" value={insights ? insights.moodTrend || 'Stable' : '...'} color="text-amber-600" />
+      <InsightCard icon={BarChart} title="7-Day Avg. Mood" value={insights ? `${insights.averageMood || 0}/10` : '...'} color="text-sanctuary-sage" />
+      <InsightCard icon={Sparkles} title="Current Streak" value={insights ? `${insights.currentStreak || 0} days` : '...'} color="text-[#52796F]" />
+      <InsightCard icon={TrendingUp} title="Mood Trend" value={insights ? insights.moodTrend || 'Stable' : '...'} color="text-sanctuary-sage-dark" />
     </div>
   </motion.div>
 );
 
 const RecentEntries = ({ entries }) => (
-  <motion.div layout className="bg-white/60 backdrop-blur-lg rounded-2xl shadow-sm border border-slate-200/80 p-6">
-    <h2 className="text-xl font-semibold text-slate-800 mb-4">Recent Entries</h2>
+  <motion.div layout className="neumorphic rounded-3xl p-6">
+    <h2 className="text-xl font-semibold text-sanctuary-slate mb-4 font-quicksand">Recent Entries</h2>
     {entries.length === 0 ? <EmptyState message="Your recent mood entries will appear here." /> : (
       <motion.div className="space-y-3" variants={{ visible: { transition: { staggerChildren: 0.1 } } }} initial="hidden" animate="visible">
         {entries.slice(0, 5).map((entry) => <RecentEntryItem key={entry.id} entry={entry} />)}
@@ -279,16 +279,16 @@ const RecentEntryItem = ({ entry }) => {
     return (
         <motion.div
             variants={{ hidden: { y: 20, opacity: 0 }, visible: { y: 0, opacity: 1 } }}
-            className="flex items-start justify-between p-4 bg-slate-50/80 rounded-xl border border-slate-200/60"
+            className="flex items-start justify-between p-4 bg-sanctuary-sand rounded-3xl border border-sanctuary-misty/30 shadow-sanctuary"
         >
             <div className="flex items-start space-x-4">
                 <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg ${getMoodColor(entry.mood)}`}>
                     {entry.mood}/10
                 </div>
                 <div>
-                    <p className="font-semibold text-slate-700">{new Date(entry.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}</p>
-                    <p className="text-sm text-slate-600 italic">“{entry.note || 'No note'}”</p>
-                    <div className="flex space-x-4 text-xs text-slate-500 mt-2">
+                    <p className="font-semibold text-sanctuary-slate font-quicksand">{new Date(entry.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}</p>
+                    <p className="text-sm text-sanctuary-slate/80 italic font-nunito">"{entry.note || 'No note'}"</p>
+                    <div className="flex space-x-4 text-xs text-sanctuary-slate/70 mt-2 font-nunito">
                         {entry.energy && <span className="flex items-center"><Zap size={12} className="mr-1 text-amber-500"/> {entry.energy}/5</span>}
                         {entry.stress && <span className="flex items-center"><CloudRain size={12} className="mr-1 text-sky-500"/> {entry.stress}/5</span>}
                         {entry.sleep && <span className="flex items-center"><Bed size={12} className="mr-1 text-indigo-500"/> {entry.sleep}h</span>}
@@ -300,10 +300,10 @@ const RecentEntryItem = ({ entry }) => {
 };
 
 const InsightCard = ({ icon: Icon, title, value, color }) => (
-  <div className="flex items-center space-x-4 bg-slate-50/80 p-4 rounded-xl border border-slate-200/60">
-    <div className={`p-3 rounded-full bg-white ${color}`}><Icon size={20} /></div>
+  <div className="flex items-center space-x-4 bg-sanctuary-sand rounded-3xl border border-sanctuary-misty/30 p-4 shadow-sanctuary">
+    <div className={`p-3 rounded-full bg-white shadow-sanctuary ${color}`}><Icon size={20} /></div>
     <div>
-      <h3 className="text-sm text-slate-600">{title}</h3>
+      <h3 className="text-sm text-sanctuary-slate/70 font-nunito">{title}</h3>
       <p className={`text-xl font-bold ${color}`}>{value}</p>
     </div>
   </div>
@@ -311,7 +311,7 @@ const InsightCard = ({ icon: Icon, title, value, color }) => (
 
 const SliderInput = ({ label, icon: Icon, min, max, value, onChange, color }) => (
   <div className="w-full">
-    <label className="flex items-center text-sm font-medium text-slate-600 mb-2">
+    <label className="flex items-center text-sm font-medium text-sanctuary-slate/80 mb-2 font-quicksand">
       <Icon size={14} className="mr-2" /> {label}
     </label>
     <div className="relative flex items-center">
@@ -319,13 +319,13 @@ const SliderInput = ({ label, icon: Icon, min, max, value, onChange, color }) =>
         className={`w-full h-2 rounded-lg cursor-pointer appearance-none ${color}`}
         style={{ backgroundSize: `${(value - min) * 100 / (max - min)}% 100%` }}
       />
-      <span className="text-xs text-slate-500 font-semibold ml-3 w-8 text-right">{value}</span>
+      <span className="text-xs text-sanctuary-slate/70 font-semibold ml-3 w-8 text-right font-nunito">{value}</span>
     </div>
   </div>
 );
 
 const EmptyState = ({ message }) => (
     <div className="text-center py-10">
-        <p className="text-slate-500">{message}</p>
+        <p className="text-sanctuary-slate/70 font-nunito">{message}</p>
     </div>
 );

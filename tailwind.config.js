@@ -21,6 +21,7 @@ module.exports = {
       fontFamily: {
         nunito: ['var(--font-nunito)', 'Nunito', 'sans-serif'],
         quicksand: ['var(--font-quicksand)', 'Quicksand', 'sans-serif'],
+        playfair: ['var(--font-playfair)', 'Playfair Display', 'serif'],
       },
       borderRadius: {
         '2xl': '1rem',

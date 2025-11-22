@@ -47,24 +47,24 @@ export default function SignInPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-50 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-sanctuary-sand flex items-center justify-center px-4">
       <div className="max-w-md w-full">
         {/* Header */}
         <div className="text-center mb-6">
           <Link
             href="/"
-            className="inline-block bg-white/80 text-emerald-800 font-semibold px-5 py-2 rounded-full text-sm hover:bg-white transition-all duration-300 shadow-sm mb-4"
+            className="inline-block neumorphic text-sanctuary-slate font-semibold px-5 py-2 rounded-3xl text-sm hover:shadow-sanctuary-hover transition-sanctuary mb-4 font-quicksand"
           >
             Back to Home
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900">Welcome Back</h1>
-          <p className="text-gray-600 mt-1">Sign in to continue your journey</p>
+          <h1 className="text-3xl font-bold text-sanctuary-slate font-quicksand">Welcome Back</h1>
+          <p className="text-sanctuary-slate/70 mt-1 font-nunito">Sign in to continue your journey</p>
         </div>
 
-        {/* Card with "Glassmorphism" effect for consistency */}
-        <div className="bg-white/60 backdrop-blur-xl rounded-2xl shadow-xl p-8 border border-white/20">
+        {/* Card with Neumorphism for consistency */}
+        <div className="neumorphic rounded-3xl p-8">
           {error && (
-            <div className="flex items-center mb-4 p-3 bg-red-100 rounded-lg text-red-700 text-sm border border-red-200">
+            <div className="flex items-center mb-4 p-3 bg-red-50 rounded-3xl text-red-600 text-sm border border-red-200 font-nunito">
               <FiAlertCircle className="mr-2 flex-shrink-0" /> {error}
             </div>
           )}
@@ -72,7 +72,7 @@ export default function SignInPage() {
           <form onSubmit={handleEmailSignIn} className="space-y-5">
             {/* Email */}
             <div className="relative">
-              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">
+              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sanctuary-slate/60">
                 <FiMail />
               </span>
               <input
@@ -80,7 +80,7 @@ export default function SignInPage() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="text-gray-700 w-full pl-10 pr-3 py-2.5 bg-white/70 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all"
+                className="text-sanctuary-slate w-full pl-10 pr-3 py-2.5 bg-white/90 border border-sanctuary-misty/40 rounded-3xl focus:outline-none focus-sanctuary transition-sanctuary font-nunito placeholder:text-sanctuary-slate/40"
                 placeholder="you@example.com"
                 required
               />
@@ -88,7 +88,7 @@ export default function SignInPage() {
 
             {/* Password */}
             <div className="relative">
-              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">
+              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sanctuary-slate/60">
                 <FiLock />
               </span>
               <input
@@ -96,7 +96,7 @@ export default function SignInPage() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="text-gray-700 w-full pl-10 pr-3 py-2.5 bg-white/70 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all"
+                className="text-sanctuary-slate w-full pl-10 pr-3 py-2.5 bg-white/90 border border-sanctuary-misty/40 rounded-3xl focus:outline-none focus-sanctuary transition-sanctuary font-nunito placeholder:text-sanctuary-slate/40"
                 placeholder="Enter your password"
                 required
               />
@@ -106,7 +106,7 @@ export default function SignInPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center disabled:bg-emerald-400 disabled:cursor-not-allowed"
+              className="w-full bg-[#52796F] hover:bg-[#3d5a52] text-white font-semibold py-3 px-4 rounded-3xl transition-sanctuary flex items-center justify-center disabled:bg-sanctuary-misty/50 disabled:cursor-not-allowed shadow-sanctuary touch-target font-quicksand"
             >
               {isLoading ? (
                 <>
@@ -120,9 +120,9 @@ export default function SignInPage() {
 
           {/* Sign Up link */}
           <div className="mt-6 text-center">
-            <p className="text-sm text-gray-700">
-              Don’t have an account?{' '}
-              <Link href="/auth/signup" className="font-semibold text-emerald-600 hover:text-emerald-800 transition-colors">
+            <p className="text-sm text-sanctuary-slate/80 font-nunito">
+              Don't have an account?{' '}
+              <Link href="/auth/signup" className="font-semibold text-[#52796F] hover:text-sanctuary-sage transition-sanctuary">
                 Sign Up
               </Link>
             </p>

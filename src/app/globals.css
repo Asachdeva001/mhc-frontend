@@ -146,6 +146,20 @@ body {
   }
 }
 
+/* Slow breathing gradient for Zen Experience */
+@keyframes gradient-breathing {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.animate-gradient-slow {
+  animation: gradient-breathing 20s ease infinite;
+}
+
 /* Soft focus ring for accessibility */
 .focus-sanctuary:focus {
   outline: none;

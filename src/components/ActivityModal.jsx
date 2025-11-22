@@ -27,16 +27,16 @@ const BreathingAnimation = ({ children }) => {
       <motion.div
         animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.8, 0.5] }}
         transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
-        className="absolute w-full h-full bg-sky-200/50 rounded-full"
+        className="absolute w-full h-full bg-sanctuary-sage/30 rounded-full"
       />
       {/* Main breathing circle */}
       <motion.div
         animate={{ scale: [1, 1.5, 1] }}
         transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
-        className="absolute w-48 h-48 bg-gradient-to-br from-sky-100 to-teal-100 rounded-full shadow-lg"
+        className="absolute w-48 h-48 bg-gradient-to-br from-sanctuary-misty to-sanctuary-sage/30 rounded-full shadow-sanctuary"
       />
       {/* Static inner circle for contrast */}
-      <div className="absolute w-40 h-40 bg-slate-50/70 rounded-full backdrop-blur-sm" />
+      <div className="absolute w-40 h-40 bg-sanctuary-sand/80 rounded-full backdrop-blur-sm" />
       {/* Content (Timer and Text) */}
       <div className="relative z-10 text-center">
         {children}
@@ -104,18 +104,18 @@ export default function ActivityModal({ activity, onComplete, onClose }) {
         animate={{ y: 0, opacity: 1, scale: 1 }}
         exit={{ y: 20, opacity: 0, scale: 0.95 }}
         transition={{ type: 'spring', damping: 20, stiffness: 200 }}
-        className="relative w-full max-w-lg bg-slate-50 rounded-2xl shadow-xl p-8 text-center"
+        className="relative w-full max-w-lg neumorphic rounded-3xl p-8 text-center"
         onClick={(e) => e.stopPropagation()}
       >
-        <button onClick={onClose} className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition">
+        <button onClick={onClose} className="absolute top-4 right-4 text-sanctuary-slate/60 hover:text-sanctuary-slate transition-sanctuary touch-target">
           <X size={24} />
         </button>
         
         <div className="flex justify-center items-center gap-3 mb-2">
-            <Wind className="text-teal-500" />
-            <h2 className="text-3xl font-bold text-slate-800">{activity.title}</h2>
+            <Wind className="text-sanctuary-sage" />
+            <h2 className="text-3xl font-bold text-sanctuary-slate font-quicksand">{activity.title}</h2>
         </div>
-        <p className="text-slate-500 mb-8 max-w-md mx-auto">{activity.description}</p>
+        <p className="text-sanctuary-slate/70 mb-8 max-w-md mx-auto font-nunito">{activity.description}</p>
         
         <div className="h-64 flex items-center justify-center">
           <AnimatePresence mode="wait">
@@ -128,7 +128,7 @@ export default function ActivityModal({ activity, onComplete, onClose }) {
                      animate={{ opacity: 1, y: 0 }}
                      exit={{ opacity: 0, y: -10 }}
                      transition={{ duration: 0.5 }}
-                     className="text-2xl text-slate-600"
+                     className="text-2xl text-sanctuary-slate font-nunito"
                    >
                      {PREP_STEPS[prepStepIndex]}
                    </motion.p>
@@ -139,7 +139,7 @@ export default function ActivityModal({ activity, onComplete, onClose }) {
                      animate={{ opacity: 1 }}
                      transition={{ delay: 1 }}
                      onClick={() => setPhase('active')}
-                     className="mt-8 bg-gradient-to-r from-teal-500 to-sky-600 text-white font-bold py-3 px-8 rounded-full transition-all duration-200 transform hover:scale-105 hover:shadow-lg"
+                     className="mt-8 bg-[#52796F] hover:bg-[#3d5a52] text-white font-bold py-3 px-8 rounded-full transition-sanctuary transform hover:scale-105 shadow-sanctuary touch-target font-quicksand"
                    >
                      Begin
                    </motion.button>
@@ -148,7 +148,7 @@ export default function ActivityModal({ activity, onComplete, onClose }) {
             ) : (
               <motion.div key="active" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                 <BreathingAnimation>
-                  <p className="font-mono text-5xl font-bold text-slate-800 tracking-tighter">
+                  <p className="font-mono text-5xl font-bold text-sanctuary-slate tracking-tighter">
                     {formatTime(timeRemaining)}
                   </p>
                   <AnimatePresence mode="wait">

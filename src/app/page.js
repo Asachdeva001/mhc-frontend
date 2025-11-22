@@ -9,7 +9,7 @@ import { MessageSquareHeart, BarChart3, Sparkles, UserPlus, PencilLine, BotMessa
 
 // Updated background gradient with a green theme
 const BackgroundGradient = () => (
-  <div className="absolute inset-0 -z-10 bg-gradient-to-tr from-emerald-50 via-teal-50 to-cyan-50" />
+  <div className="absolute inset-0 -z-10 bg-sanctuary-sand" />
 );
 
 
@@ -35,12 +35,12 @@ const FeatureCard = ({ icon, title, text, delay }) => {
       transition={{ type: 'spring', stiffness: 300 }}
     >
       <div className="flex justify-center items-center mb-4">
-        <div className="p-4 bg-white rounded-full shadow-md">
+        <div className="p-4 bg-white rounded-full shadow-sanctuary">
           {icon}
         </div>
       </div>
-      <h3 className="text-xl font-bold text-gray-800 mb-2">{title}</h3>
-      <p className="text-gray-600 leading-relaxed">{text}</p>
+      <h3 className="text-xl font-bold text-sanctuary-slate mb-2 font-quicksand">{title}</h3>
+      <p className="text-sanctuary-slate/80 leading-relaxed font-nunito">{text}</p>
     </motion.div>
   );
 };
@@ -106,15 +106,15 @@ export default function LandingPage() {
         }}
       >
         <div className="container mx-auto px-6 py-4 flex justify-between items-center">
-          <Link href="/" className="text-2xl font-bold text-gray-800">
-            Mental<span className="text-emerald-600">Buddy</span>
+          <Link href="/" className="text-2xl font-bold text-sanctuary-slate font-quicksand">
+            Mental<span className="text-sanctuary-sage">Buddy</span>
           </Link>
           <nav className="flex items-center space-x-2 md:space-x-4">
-            <Link href="/auth/signin" className="px-4 py-2 text-gray-600 hover:text-emerald-600 transition-colors rounded-full hover:bg-gray-900/5">
+            <Link href="/auth/signin" className="px-4 py-2 text-sanctuary-slate/80 hover:text-sanctuary-sage transition-sanctuary rounded-full hover:bg-sanctuary-misty/20 font-nunito">
               Sign In
             </Link>
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Link href="/auth/signup" className="bg-emerald-500 text-white font-semibold px-5 py-2 rounded-full hover:bg-emerald-600 transition-all duration-300 shadow-lg hover:shadow-emerald-500/30">
+              <Link href="/auth/signup" className="bg-[#52796F] text-white font-semibold px-5 py-2 rounded-full hover:bg-[#3d5a52] transition-sanctuary shadow-sanctuary hover:shadow-sanctuary-hover font-quicksand">
                 Sign Up
               </Link>
             </motion.div>
@@ -126,21 +126,21 @@ export default function LandingPage() {
         {/* Hero Section */}
         <section className="container mx-auto px-6 py-16 text-center">
           <motion.h1 
-            className="text-4xl md:text-6xl lg:text-7xl font-extrabold text-gray-900 mb-6 leading-tight"
+            className="text-4xl md:text-6xl lg:text-7xl font-extrabold text-sanctuary-slate mb-6 leading-tight font-quicksand"
             variants={heroContainerVariants}
             initial="hidden"
             animate="visible"
           >
             <motion.span className="block" variants={heroItemVariants}>A helping hand for a</motion.span>
             <motion.span 
-              className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-600 block"
+              className="text-transparent bg-clip-text bg-gradient-to-r from-sanctuary-sage to-[#52796F] block"
               variants={heroItemVariants}
             >
               healthier mind
             </motion.span>
           </motion.h1>
           <motion.p 
-            className="text-lg md:text-xl text-gray-600 mb-12 max-w-3xl mx-auto tracking-wide"
+            className="text-lg md:text-xl text-sanctuary-slate/80 mb-12 max-w-3xl mx-auto tracking-wide font-nunito"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
@@ -151,12 +151,12 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.6 }}
-            whileHover={{ scale: 1.05, boxShadow: '0px 15px 30px -10px rgba(16, 185, 129, 0.4)' }}
+            whileHover={{ scale: 1.05, boxShadow: '0px 15px 30px -10px rgba(132, 169, 140, 0.4)' }}
             whileTap={{ scale: 0.95 }}
           >
             <Link
               href="/auth/signup"
-              className="bg-emerald-500 text-white font-bold py-4 px-10 rounded-full text-lg transition-all duration-300 shadow-xl"
+              className="bg-[#52796F] text-white font-bold py-4 px-10 rounded-full text-lg transition-sanctuary shadow-sanctuary hover:bg-[#3d5a52] font-quicksand"
             >
               Get Started for Free
             </Link>
@@ -166,24 +166,24 @@ export default function LandingPage() {
         {/* Features Section */}
         <section className="container mx-auto px-6 py-20">
           <div className="text-center mb-16">
-             <h2 className="text-3xl md:text-4xl font-bold text-gray-800">Everything you need to feel your best</h2>
-             <p className="text-md text-gray-500 mt-2">Discover tools designed for your well-being.</p>
+             <h2 className="text-3xl md:text-4xl font-bold text-sanctuary-slate font-quicksand">Everything you need to feel your best</h2>
+             <p className="text-md text-sanctuary-slate/70 mt-2 font-nunito">Discover tools designed for your well-being.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <FeatureCard
-              icon={<MessageSquareHeart size={32} className="text-emerald-500" />}
+              icon={<MessageSquareHeart size={32} className="text-sanctuary-sage" />}
               title="AI Chat Support"
               text="Get instant, compassionate, and personalized mental health support whenever you need it."
               delay={0.1}
             />
             <FeatureCard
-              icon={<BarChart3 size={32} className="text-teal-500" />}
+              icon={<BarChart3 size={32} className="text-[#52796F]" />}
               title="Mood Tracking"
               text="Log your emotional patterns with insightful analytics to understand your journey and progress."
               delay={0.2}
             />
             <FeatureCard
-              icon={<Sparkles size={32} className="text-cyan-500" />}
+              icon={<Sparkles size={32} className="text-sanctuary-sage-light" />}
               title="Wellness Activities"
               text="Explore a library of guided meditations, breathing exercises, and activities to boost your wellbeing."
               delay={0.3}
@@ -194,30 +194,30 @@ export default function LandingPage() {
          {/* How It Works Section */}
         <section className="container mx-auto px-6 py-20">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-800">Get started in 3 simple steps</h2>
-            <p className="text-md text-gray-500 mt-2">Your journey to a better mind is just moments away.</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-sanctuary-slate font-quicksand">Get started in 3 simple steps</h2>
+            <p className="text-md text-sanctuary-slate/70 mt-2 font-nunito">Your journey to a better mind is just moments away.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
             <motion.div initial={{y: 20, opacity: 0}} whileInView={{y: 0, opacity: 1}} transition={{delay: 0.1}} viewport={{ once: true }}>
-              <div className="flex justify-center items-center mb-4 h-16 w-16 mx-auto bg-white rounded-full shadow-lg border">
-                <UserPlus size={32} className="text-emerald-500" />
+              <div className="flex justify-center items-center mb-4 h-16 w-16 mx-auto bg-white rounded-full shadow-sanctuary border border-sanctuary-misty/30">
+                <UserPlus size={32} className="text-sanctuary-sage" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">1. Create Account</h3>
-              <p className="text-gray-600">Sign up for free and tell us a little about your goals.</p>
+              <h3 className="text-xl font-semibold mb-2 text-sanctuary-slate font-quicksand">1. Create Account</h3>
+              <p className="text-sanctuary-slate/80 font-nunito">Sign up for free and tell us a little about your goals.</p>
             </motion.div>
             <motion.div initial={{y: 20, opacity: 0}} whileInView={{y: 0, opacity: 1}} transition={{delay: 0.2}} viewport={{ once: true }}>
-              <div className="flex justify-center items-center mb-4 h-16 w-16 mx-auto bg-white rounded-full shadow-lg border">
-                <PencilLine size={32} className="text-teal-500" />
+              <div className="flex justify-center items-center mb-4 h-16 w-16 mx-auto bg-white rounded-full shadow-sanctuary border border-sanctuary-misty/30">
+                <PencilLine size={32} className="text-[#52796F]" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">2. Log Your Moods</h3>
-              <p className="text-gray-600">Start tracking your feelings and activities to find patterns.</p>
+              <h3 className="text-xl font-semibold mb-2 text-sanctuary-slate font-quicksand">2. Log Your Moods</h3>
+              <p className="text-sanctuary-slate/80 font-nunito">Start tracking your feelings and activities to find patterns.</p>
             </motion.div>
             <motion.div initial={{y: 20, opacity: 0}} whileInView={{y: 0, opacity: 1}} transition={{delay: 0.3}} viewport={{ once: true }}>
-              <div className="flex justify-center items-center mb-4 h-16 w-16 mx-auto bg-white rounded-full shadow-lg border">
-                <BotMessageSquare size={32} className="text-cyan-500" />
+              <div className="flex justify-center items-center mb-4 h-16 w-16 mx-auto bg-white rounded-full shadow-sanctuary border border-sanctuary-misty/30">
+                <BotMessageSquare size={32} className="text-sanctuary-sage-light" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">3. Chat with Buddy</h3>
-              <p className="text-gray-600">Talk to your AI companion anytime you need support or guidance.</p>
+              <h3 className="text-xl font-semibold mb-2 text-sanctuary-slate font-quicksand">3. Chat with Buddy</h3>
+              <p className="text-sanctuary-slate/80 font-nunito">Talk to your AI companion anytime you need support or guidance.</p>
             </motion.div>
           </div>
         </section>

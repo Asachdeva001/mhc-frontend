@@ -5,13 +5,14 @@ import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../lib/authContext';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LayoutDashboard, MessageSquare, PlusCircle, Leaf, LogOut, ChevronDown, Menu, X } from 'lucide-react';
+import { LayoutDashboard, MessageSquare, PlusCircle, Leaf, LogOut, ChevronDown, Menu, X, BookOpen } from 'lucide-react';
 
 // A cleaner way to manage navigation links
 const navLinks = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, pageName: 'dashboard' },
   { href: '/chat', label: 'Chat', icon: MessageSquare, pageName: 'chat' },
   { href: '/activities', label: 'Activities', icon: PlusCircle, pageName: 'activities' },
+  { href: '/journal', label: 'Journal', icon: BookOpen, pageName: 'journal' },
 ];
 
 export default function Navigation({ currentPage = '' }) {
