@@ -86,59 +86,69 @@ export default function Stretching({
   const currentRound = Math.floor((totalTime - timeRemaining) / (TOTAL_STRETCHES * SECONDS_PER_STRETCH)) + 1;
 
   return (
-    <div className="w-full flex flex-col items-center">
-      <div className="w-full max-w-md bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl shadow-lg p-6 text-center">
-        {/* Header */}
-        <div className="mb-4">
-          <div className="text-sm text-slate-600 font-medium">
-            Exercise {stretchIndex + 1} of {TOTAL_STRETCHES}
-            {totalRounds > 1 && <span className="ml-2">• Round {currentRound}/{totalRounds}</span>}
+    <div className="w-full max-w-lg mx-auto flex flex-col items-center px-4 py-6">
+      <div className="relative w-full rounded-3xl bg-gradient-to-br from-white/60 to-white/40 backdrop-blur-xl border-2 border-white/60 shadow-2xl p-8 text-center">
+        {/* Header with badge */}
+        <div className="mb-6">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-sm font-bold rounded-full shadow-lg font-quicksand">
+            <span>Exercise {stretchIndex + 1} / {TOTAL_STRETCHES}</span>
+            {totalRounds > 1 && <span>• Round {currentRound}/{totalRounds}</span>}
           </div>
         </div>
 
-        {/* Exercise Name with Emoji */}
-        <div className="text-5xl mb-3">{currentStretch.emoji}</div>
-        <h3 className="text-2xl font-bold text-slate-800 mb-2">{currentStretch.name}</h3>
-        <p className="text-slate-600 text-sm mb-6 px-2">{currentStretch.description}</p>
+        {/* Exercise emoji with glow */}
+        <motion.div 
+          className="relative mb-6 flex justify-center"
+          animate={{ scale: [1, 1.1, 1] }}
+          transition={{ duration: 2, repeat: Infinity }}
+        >
+          <div className="absolute w-24 h-24 bg-gradient-to-br from-emerald-400/30 to-teal-400/30 rounded-full blur-xl" />
+          <div className="relative text-7xl">{currentStretch.emoji}</div>
+        </motion.div>
+        
+        <h3 className="text-3xl font-bold text-sanctuary-slate mb-3 font-nunito">{currentStretch.name}</h3>
+        <p className="text-sanctuary-slate/70 text-base mb-8 px-4 font-quicksand leading-relaxed">{currentStretch.description}</p>
 
         {/* Circular Time Display */}
-        <div className="mb-6 flex justify-center">
+        <div className="mb-8 flex justify-center">
           <motion.div
-            className="relative w-32 h-32 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center shadow-lg"
-            initial={{ scale: 0.9 }}
-            animate={{ scale: 1 }}
-            transition={{ duration: 0.3 }}
+            className="relative w-36 h-36 rounded-full bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center shadow-2xl"
+            animate={{ scale: [1, 1.05, 1] }}
+            transition={{ duration: 1.5, repeat: Infinity }}
           >
-            <div className="text-4xl font-bold text-white tabular-nums">
+            <div className="absolute inset-0 rounded-full bg-white/20 backdrop-blur-sm" />
+            <div className="relative text-5xl font-bold text-white tabular-nums font-nunito">
               {Math.ceil(timeForCurrentStretch)}
             </div>
-            <div className="absolute inset-0 rounded-full border-4 border-emerald-200 opacity-50" />
+            <div className="absolute bottom-3 text-xs text-white/80 font-quicksand">seconds</div>
           </motion.div>
         </div>
 
-        {/* Progress Bar */}
-        <div className="mb-4">
-          <div className="flex gap-1">
+        {/* Progress indicators */}
+        <div className="mb-6">
+          <div className="flex gap-2 justify-center">
             {STRETCHES.map((_, i) => (
               <motion.div
                 key={i}
-                className={`h-1.5 flex-1 rounded-full transition-colors ${
+                className={`h-2 rounded-full transition-all duration-300 ${
                   i < stretchIndex
-                    ? 'bg-emerald-500'
+                    ? 'w-8 bg-emerald-500 shadow-lg'
                     : i === stretchIndex
-                    ? 'bg-emerald-400'
-                    : 'bg-slate-200'
+                    ? 'w-12 bg-gradient-to-r from-emerald-400 to-teal-500 shadow-xl'
+                    : 'w-6 bg-sanctuary-slate/20'
                 }`}
-                animate={i === stretchIndex ? { scaleX: [1, 1.05, 1] } : {}}
-                transition={{ duration: 2, repeat: Infinity }}
+                animate={i === stretchIndex ? { scaleX: [1, 1.1, 1] } : {}}
+                transition={{ duration: 1.5, repeat: Infinity }}
               />
             ))}
           </div>
         </div>
 
-        {/* Instructions */}
-        <div className="text-xs text-slate-500 italic">
-          {isPaused ? 'Paused - Resume when ready' : 'Hold this stretch gently'}
+        {/* Status message */}
+        <div className="px-4 py-2 bg-white/60 backdrop-blur-sm rounded-full border border-white/80 shadow-sm inline-block">
+          <div className="text-sm font-medium text-sanctuary-slate/70 font-quicksand">
+            {isPaused ? '⏸ Paused - Resume when ready' : '✨ Hold this stretch gently'}
+          </div>
         </div>
       </div>
     </div>

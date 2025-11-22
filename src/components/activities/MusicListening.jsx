@@ -64,46 +64,78 @@ export default function MusicListening({
   };
 
   return (
-    <div className="w-full flex flex-col items-center">
-      <div className="w-full max-w-md rounded-lg bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 p-8 flex flex-col items-center shadow-lg">
-        <div className="mb-6">
-          <motion.div
-            animate={isPlaying ? { rotate: 360 } : { rotate: 0 }}
-            transition={{ duration: 3, repeat: isPlaying ? Infinity : 0 }}
-          >
-            <Music className="w-12 h-12 text-purple-500" />
-          </motion.div>
-        </div>
+    <div className="w-full max-w-lg mx-auto flex flex-col items-center px-4 py-6">
+      {/* Glow effect */}
+      <motion.div
+        animate={isPlaying ? { opacity: [0.3, 0.7, 0.3], scale: [1, 1.1, 1] } : { opacity: 0.3 }}
+        transition={{ duration: 3, repeat: isPlaying ? Infinity : 0 }}
+        className="absolute w-96 h-96 bg-gradient-to-r from-purple-400/20 via-pink-400/20 to-indigo-400/20 rounded-full blur-3xl"
+      />
+      
+      <div className="relative w-full rounded-3xl bg-gradient-to-br from-white/60 to-white/40 backdrop-blur-xl border-2 border-white/60 shadow-2xl p-8 flex flex-col items-center">
+        {/* Animated music icon */}
+        <motion.div
+          animate={isPlaying ? { 
+            rotate: 360, 
+            scale: [1, 1.1, 1]
+          } : {}}
+          transition={{ 
+            rotate: { duration: 4, repeat: isPlaying ? Infinity : 0, ease: 'linear' },
+            scale: { duration: 1, repeat: isPlaying ? Infinity : 0 }
+          }}
+          className="w-24 h-24 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-xl mb-6"
+        >
+          <Music className="w-12 h-12 text-white" strokeWidth={2.5} />
+        </motion.div>
         
         <div className="text-center mb-6">
-          <h3 className="text-xl font-bold text-slate-800 mb-2">Music Therapy</h3>
-          <p className="text-sm text-slate-600">{activity.description}</p>
+          <h3 className="text-2xl sm:text-3xl font-bold text-sanctuary-slate mb-3 font-nunito">Music Therapy</h3>
+          <p className="text-base text-sanctuary-slate/70 font-quicksand">{activity.description}</p>
         </div>
 
-        <div className="mb-6 text-5xl font-bold text-purple-600 tabular-nums">
-          {formatTime(timeRemaining)}
-        </div>
+        {/* Animated visualizer bars */}
+        {isPlaying && (
+          <div className="flex gap-1.5 mb-6">
+            {[...Array(5)].map((_, i) => (
+              <motion.div
+                key={i}
+                animate={{ scaleY: [1, 2, 1] }}
+                transition={{
+                  duration: 0.8,
+                  repeat: Infinity,
+                  delay: i * 0.15,
+                  ease: 'easeInOut'
+                }}
+                className="w-2 h-8 bg-gradient-to-t from-purple-500 to-pink-500 rounded-full origin-bottom"
+              />
+            ))}
+          </div>
+        )}
 
-        <button
+        <motion.button
           onClick={togglePlayback}
           disabled={isPaused || !audioReady}
-          className="flex items-center gap-2 px-6 py-3 bg-purple-500 hover:bg-purple-600 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold rounded-full transition-all transform hover:scale-105"
+          whileHover={{ scale: 1.05, y: -2 }}
+          whileTap={{ scale: 0.95 }}
+          className="flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-purple-500 via-pink-500 to-indigo-500 hover:from-indigo-500 hover:to-purple-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold rounded-2xl transition-all shadow-xl text-lg font-quicksand"
         >
           {isPlaying ? (
             <>
-              <Pause size={20} />
-              Now Playing
+              <Pause size={24} fill="currentColor" />
+              <span>Now Playing</span>
             </>
           ) : (
             <>
-              <Play size={20} />
-              Start Music
+              <Play size={24} fill="currentColor" />
+              <span>Start Music</span>
             </>
           )}
-        </button>
+        </motion.button>
 
-        <div className="mt-4 text-xs text-slate-600">
-          {isPlaying ? '🎵 Music is playing...' : audioReady ? 'Ready to listen' : 'Loading audio...'}
+        <div className="mt-6 px-4 py-2 bg-white/60 backdrop-blur-sm rounded-full border border-white/80 shadow-sm">
+          <div className="text-sm font-medium text-sanctuary-slate/70 font-quicksand">
+            {isPlaying ? '🎵 Music is playing...' : audioReady ? '✅ Ready to listen' : '⏳ Loading audio...'}
+          </div>
         </div>
 
         {/* Hidden audio element with proper event handlers */}

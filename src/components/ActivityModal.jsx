@@ -31,41 +31,37 @@ const formatTime = (seconds) => {
 const VictoryAnimation = ({ onComplete, onClose, activityId }) => {
   useEffect(() => {
     const timer = setTimeout(() => {
-      // First record the activity completion, then close
       if (onComplete) {
         onComplete(activityId);
       }
-      // Immediately close to show victory screen clearly
       setTimeout(() => {
         if (onClose) {
           onClose();
         }
-      }, 50); // Reduced from 100ms for faster close
-    }, 3500); // Reduced from 4000ms to show victory longer relative to screen
+      }, 50);
+    }, 3500);
     return () => clearTimeout(timer);
   }, [onComplete, onClose, activityId]);
 
   return (
-    <div className="relative w-64 h-64 flex items-center justify-center">
-      {/* Outer pulsing glow */}
-      <motion.div
-        animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.8, 0.5] }}
-        transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
-        className="absolute w-full h-full bg-sanctuary-sage/30 rounded-full"
-      />
-      {/* Main breathing circle */}
-      <motion.div
-        animate={{ scale: [1, 1.5, 1] }}
-        transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
-        className="absolute w-48 h-48 bg-gradient-to-br from-sanctuary-misty to-sanctuary-sage/30 rounded-full shadow-sanctuary"
-      />
-      {/* Static inner circle for contrast */}
-      <div className="absolute w-40 h-40 bg-sanctuary-sand/80 rounded-full backdrop-blur-sm" />
-      {/* Content (Timer and Text) */}
-      <div className="relative z-10 text-center">
-        {children}
+    <motion.div
+      initial={{ scale: 0, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      exit={{ scale: 0, opacity: 0 }}
+      className="absolute inset-0 flex items-center justify-center z-50 bg-sanctuary-sand/80 backdrop-blur-sm rounded-3xl"
+    >
+      <div className="text-center">
+        <motion.div
+          animate={{ scale: [1, 1.2, 1] }}
+          transition={{ duration: 1, repeat: Infinity }}
+          className="text-6xl mb-4"
+        >
+          🎉
+        </motion.div>
+        <h3 className="text-2xl font-bold text-sanctuary-slate font-nunito mb-2">Well Done!</h3>
+        <p className="text-sanctuary-slate/70 font-quicksand">Activity completed</p>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
@@ -78,6 +74,26 @@ const ACTIVITY_DEFAULTS = {
   'dance-break': { duration: 300, prepPhase: false },            // 5 minutes
   'stretching': { duration: 300, prepPhase: false },             // 5 minutes
   'doodle': { duration: 0, prepPhase: false },
+};
+
+// Helper to get activity component
+const getActivityComponent = (activityId) => {
+  switch (activityId) {
+    case 'breathing-exercise':
+      return BreathingExercise;
+    case 'meditation':
+      return Meditation;
+    case 'music-listening':
+      return MusicListening;
+    case 'stretching':
+      return Stretching;
+    case 'dance-break':
+      return DanceBreak;
+    case 'doodle':
+      return Doodle;
+    default:
+      return null;
+  }
 };
 
 // --- Main Activity Modal Component ---
@@ -93,6 +109,9 @@ export default function ActivityModal({ activity, onComplete, onClose }) {
   // Check if activity is incomplete (resuming from saved state)
   const isResuming = activity.isIncomplete && activity.incompleteSavedState;
   const savedState = isResuming ? activity.incompleteSavedState : null;
+  
+  // Get the component for this activity
+  const ActivityComponent = getActivityComponent(activity.id);
 
   // Effect for the preparation phase instruction sequence (only for breathing & meditation)
   useEffect(() => {
@@ -130,27 +149,42 @@ export default function ActivityModal({ activity, onComplete, onClose }) {
       </AnimatePresence>
       
       <motion.div
-        initial={{ y: 20, opacity: 0, scale: 0.95 }}
-        animate={{ y: 0, opacity: 1, scale: 1 }}
-        exit={{ y: 20, opacity: 0, scale: 0.95 }}
-        transition={{ type: 'spring', damping: 20, stiffness: 200 }}
-        className="relative w-full max-w-lg neumorphic rounded-3xl p-8 text-center"
-        onClick={(e) => e.stopPropagation()}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.2 }}
+        className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto"
+        onClick={onClose}
       >
-        <button onClick={onClose} className="absolute top-4 right-4 text-sanctuary-slate/60 hover:text-sanctuary-slate transition-sanctuary touch-target">
-          <X size={24} />
-        </button>
+        <motion.div
+          initial={{ y: 20, opacity: 0, scale: 0.95 }}
+          animate={{ y: 0, opacity: 1, scale: 1 }}
+          exit={{ y: 20, opacity: 0, scale: 0.95 }}
+          transition={{ type: 'spring', damping: 20, stiffness: 200 }}
+          className="relative w-full max-w-2xl max-h-[90vh] frosted-glass rounded-3xl p-6 sm:p-8 md:p-10 text-center border-2 border-white/40 shadow-2xl overflow-y-auto my-4"
+          onClick={(e) => e.stopPropagation()}
+        >
+        <motion.button 
+          onClick={onClose} 
+          whileHover={{ scale: 1.1, rotate: 90 }}
+          whileTap={{ scale: 0.9 }}
+          className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center text-sanctuary-slate/60 hover:text-sanctuary-slate hover:bg-white transition-all shadow-lg"
+        >
+          <X size={20} />
+        </motion.button>
         
-        <div className="flex justify-center items-center gap-3 mb-2">
-            <Wind className="text-sanctuary-sage" />
-            <h2 className="text-3xl font-bold text-sanctuary-slate font-quicksand">{activity.title}</h2>
+        <div className="flex flex-col sm:flex-row justify-center items-center gap-3 mb-4">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-sanctuary-sage/30 to-sanctuary-misty/40 flex items-center justify-center shadow-lg">
+              <Wind className="text-sanctuary-sage" size={28} />
+            </div>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-sanctuary-slate font-nunito text-center sm:text-left">{activity.title}</h2>
         </div>
-        <p className="text-sanctuary-slate/70 mb-8 max-w-md mx-auto font-nunito">{activity.description}</p>
+        <p className="text-sanctuary-slate/70 mb-8 max-w-2xl mx-auto font-quicksand text-base sm:text-lg px-4">{activity.description}</p>
         
         <div className="h-64 flex items-center justify-center">
           <AnimatePresence mode="wait">
             {phase === 'prepare' ? (
-              <motion.div key="prepare" /* ... (Preparation phase unchanged) ... */ >
+              <motion.div key="prepare" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                  <AnimatePresence mode="wait">
                    <motion.p
                      key={prepStepIndex}
@@ -175,66 +209,27 @@ export default function ActivityModal({ activity, onComplete, onClose }) {
                    </motion.button>
                  )}
               </motion.div>
-            ) : (
-              <motion.div key="active" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                <BreathingAnimation>
-                  <p className="font-mono text-5xl font-bold text-sanctuary-slate tracking-tighter">
-                    {formatTime(timeRemaining)}
-                  </p>
-                  <AnimatePresence mode="wait">
-                    <motion.p
-                      key={prepStepIndex}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      transition={{ duration: 0.5 }}
-                      className="text-xl sm:text-2xl text-slate-600"
-                    >
-                      {PREP_STEPS[prepStepIndex]}
-                    </motion.p>
-                  </AnimatePresence>
-                  {prepStepIndex === PREP_STEPS.length - 1 && (
-                    <motion.button
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 1 }}
-                      onClick={() => setPhase('active')}
-                      className="mt-8 bg-gradient-to-r from-teal-500 to-sky-600 text-white font-bold py-2 px-6 sm:py-3 sm:px-8 rounded-full transition-all duration-200 transform hover:scale-105 hover:shadow-lg text-sm sm:text-base"
-                    >
-                      Begin
-                    </motion.button>
-                  )}
-                </motion.div>
+            ) : phase === 'active' ? (
+              isTimed ? (
+                <TimedActivityWrapper
+                  activity={activity}
+                  ActivityComponent={ActivityComponent}
+                  initialDuration={defaultDuration}
+                  onComplete={handleActivityComplete}
+                  onClose={onClose}
+                  isResuming={isResuming}
+                  savedState={savedState}
+                />
               ) : (
-                // Non-timed activities (doodle, etc.)
                 <motion.div key="active" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                  {getActivityComponent(activity.id)}
+                  {ActivityComponent && <ActivityComponent onComplete={() => handleActivityComplete(activity.id)} />}
                 </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+              )
+            ) : null}
+          </AnimatePresence>
+        </div>
         </motion.div>
       </motion.div>
     </>
   );
-}
-
-// Helper to get activity component
-function getActivityComponent(activityId) {
-  switch (activityId) {
-    case 'breathing-exercise':
-      return BreathingExercise;
-    case 'meditation':
-      return Meditation;
-    case 'doodle':
-      return Doodle;
-    case 'music-listening':
-      return MusicListening;
-    case 'stretching':
-      return Stretching;
-    case 'dance-break':
-      return DanceBreak;
-    default:
-      return null;
-  }
 }

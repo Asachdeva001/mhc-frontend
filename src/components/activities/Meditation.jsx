@@ -48,38 +48,65 @@ export default function Meditation({
   }, [isPaused]);
 
   return (
-    <div className="w-full flex flex-col items-center">
-      <div className="mb-6 text-slate-700 text-center max-w-md px-4">
-        {activity.description}
+    <div className="w-full max-w-2xl mx-auto flex flex-col items-center gap-6 py-6 px-4">
+      {/* Description */}
+      <div className="text-center">
+        <p className="text-lg text-sanctuary-slate/70 font-quicksand max-w-md">
+          {activity.description}
+        </p>
       </div>
 
       {/* Affirmation Display */}
-      <div className="w-72 h-32 rounded-xl bg-gradient-to-br from-violet-100 to-indigo-100 flex items-center justify-center shadow-inner mb-6 min-h-32">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={affirmationIndex}
-            initial={{ opacity: 0, y: 10, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -10, scale: 0.95 }}
-            transition={{ duration: 0.5 }}
-            className="text-2xl font-semibold text-indigo-700 text-center px-4"
-          >
-            {MEDITATION_AFFIRMATIONS[affirmationIndex]}
-          </motion.div>
-        </AnimatePresence>
+      <div className="relative w-full max-w-md">
+        <motion.div
+          animate={{ opacity: [0.5, 1, 0.5] }}
+          transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+          className="absolute -inset-4 bg-gradient-to-r from-purple-400/20 via-pink-400/20 to-indigo-400/20 rounded-3xl blur-xl"
+        />
+        <div className="relative min-h-[140px] rounded-3xl bg-gradient-to-br from-white/60 to-white/40 backdrop-blur-xl border-2 border-white/60 shadow-2xl flex items-center justify-center p-8">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={affirmationIndex}
+              initial={{ opacity: 0, y: 20, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -20, scale: 0.9 }}
+              transition={{ duration: 0.6, ease: 'easeOut' }}
+              className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-indigo-600 bg-clip-text text-transparent text-center font-nunito"
+            >
+              ✨ {MEDITATION_AFFIRMATIONS[affirmationIndex]} ✨
+            </motion.div>
+          </AnimatePresence>
+        </div>
       </div>
 
-      {/* Timer Display */}
-      <div className="w-72 h-48 rounded-xl bg-gradient-to-b from-indigo-50 to-violet-100 flex items-center justify-center shadow-inner">
+      {/* Breathing circle animation */}
+      <div className="relative flex items-center justify-center my-4">
         <motion.div
-          animate={!isPaused ? { scale: [1, 1.05, 1] } : {}}
-          transition={{ duration: 8, repeat: !isPaused ? Infinity : 0 }}
-          className="p-6"
+          animate={!isPaused ? { scale: [1, 1.2, 1], opacity: [0.4, 0.7, 0.4] } : { opacity: 0.4 }}
+          transition={!isPaused ? { duration: 6, repeat: Infinity, ease: 'easeInOut' } : {}}
+          className="w-32 h-32 rounded-full bg-gradient-to-br from-purple-400/30 to-indigo-400/30 blur-xl absolute"
+        />
+        <motion.div
+          animate={!isPaused ? { scale: [1, 1.15, 1] } : {}}
+          transition={!isPaused ? { duration: 6, repeat: Infinity, ease: 'easeInOut' } : {}}
+          className="relative w-24 h-24 rounded-full bg-gradient-to-br from-white/60 to-white/40 backdrop-blur-xl border-2 border-white/60 shadow-xl flex items-center justify-center"
         >
-          <div className="text-5xl font-bold text-slate-800 tabular-nums">
-            {formatTime(timeRemaining)}
-          </div>
+          <span className="text-3xl">🧘</span>
         </motion.div>
+      </div>
+
+      {/* Affirmation counter */}
+      <div className="flex gap-1.5 flex-wrap justify-center max-w-xs">
+        {MEDITATION_AFFIRMATIONS.map((_, index) => (
+          <div
+            key={index}
+            className={`w-2 h-2 rounded-full transition-all duration-300 ${
+              index === affirmationIndex 
+                ? 'bg-gradient-to-r from-purple-500 to-pink-500 scale-150 shadow-lg' 
+                : 'bg-sanctuary-slate/20'
+            }`}
+          />
+        ))}
       </div>
     </div>
   );

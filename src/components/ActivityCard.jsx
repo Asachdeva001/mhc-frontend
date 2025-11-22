@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Check } from 'lucide-react';
+import { Check, Clock } from 'lucide-react';
 
 const EMOJI_MAP = {
   Mindfulness: '🧘',
@@ -17,58 +17,79 @@ export default function ActivityCard({ activity, onStart }) {
   const isCompleted = activity.completed;
   const isIncomplete = activity.isIncomplete;
 
-  const cardStateStyles = isCompleted
-    ? 'bg-sanctuary-sage/10 border-sanctuary-sage/20'
-    : 'neumorphic hover:shadow-sanctuary-hover';
-
-  const buttonText = isIncomplete ? 'Resume' : isCompleted ? 'Repeat' : 'Begin';
-  const buttonStyles = isIncomplete
-    ? 'flex-shrink-0 w-full bg-yellow-400 hover:bg-yellow-500 text-yellow-900 font-semibold py-2.5 rounded-full transition transform hover:scale-105'
-    : isCompleted
-    ? 'flex-shrink-0 w-full bg-white/90 text-slate-800 font-semibold py-2.5 rounded-full border border-slate-200 transition transform hover:scale-105'
-    : 'flex-shrink-0 w-full bg-slate-800 hover:bg-slate-900 text-white font-semibold py-2.5 rounded-full transition transform hover:scale-105';
-
   return (
     <motion.div
       layout
       variants={{ hidden: { y: 20, opacity: 0 }, visible: { y: 0, opacity: 1 } }}
-      className={`aspect-square rounded-3xl transition-sanctuary flex flex-col justify-between p-5 text-center ${cardStateStyles}`}
+      whileHover={{ y: -8, scale: 1.02 }}
+      className={`relative overflow-hidden rounded-3xl backdrop-blur-xl border transition-all duration-300 ${
+        isCompleted 
+          ? 'bg-gradient-to-br from-sanctuary-sage/20 to-sanctuary-misty/30 border-sanctuary-sage/30 shadow-lg' 
+          : 'bg-white/40 border-white/60 shadow-xl hover:shadow-2xl'
+      }`}
     >
+      {/* Gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-br from-white/50 via-transparent to-sanctuary-sage/10 pointer-events-none" />
+      
       {/* Status badges */}
       {isIncomplete && (
-        <div className="absolute top-3 right-3 bg-yellow-200 text-yellow-900 text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-2 border border-yellow-300">
-          <span>In Progress</span>
-        </div>
+        <motion.div 
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          className="absolute top-3 right-3 z-10 bg-gradient-to-r from-yellow-400 to-amber-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg"
+        >
+          In Progress
+        </motion.div>
       )}
       {isCompleted && !isIncomplete && (
-        <div className="absolute top-3 right-3 bg-teal-50 text-teal-700 text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-2 border border-teal-100">
-          <Check size={14} />
-          <span>Completed</span>
-        </div>
-      )}
-
-      <div className="flex-grow flex flex-col items-center justify-center">
-        <div className="text-5xl mb-3">{EMOJI_MAP[activity.category] || EMOJI_MAP.default}</div>
-        <h3 className="text-lg font-bold text-sanctuary-slate leading-tight font-quicksand">{activity.title}</h3>
-        <div className="flex items-center justify-center gap-1.5 text-sm text-sanctuary-slate/70 mt-2 font-nunito">
-          <Clock size={14} />
-          <span>{activity.duration} min</span>
-        </div>
-      </div>
-
-      {isCompleted ? (
-        <div className="flex-shrink-0 flex items-center justify-center gap-2 text-sm font-semibold text-sanctuary-sage bg-sanctuary-sage/20 rounded-full py-2.5 font-quicksand">
-            <Check size={16} />
-            <span>Completed</span>
-        </div>
-      ) : (
-        <button
-          onClick={() => onStart(activity)}
-          className="flex-shrink-0 w-full bg-[#52796F] hover:bg-[#3d5a52] text-white font-semibold py-2.5 rounded-full transition-sanctuary transform hover:scale-105 shadow-sanctuary touch-target font-quicksand"
+        <motion.div 
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          className="absolute top-3 right-3 z-10 bg-gradient-to-r from-sanctuary-sage to-teal-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5"
         >
-          Begin
-        </button>
+          <Check size={12} />
+          Done
+        </motion.div>
       )}
+
+      {/* Card content */}
+      <div className="relative p-6 sm:p-8 flex flex-col items-center justify-between min-h-[280px] sm:min-h-[320px]">
+        {/* Icon with breathing animation */}
+        <motion.div 
+          className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-br from-sanctuary-sage/30 to-sanctuary-misty/40 flex items-center justify-center mb-4 shadow-inner"
+          whileHover={{ rotate: [0, -10, 10, -10, 0] }}
+          transition={{ duration: 0.5 }}
+        >
+          <span className="text-4xl sm:text-5xl">{EMOJI_MAP[activity.category] || EMOJI_MAP.default}</span>
+        </motion.div>
+
+        {/* Title and duration */}
+        <div className="flex-grow flex flex-col items-center justify-center text-center mb-4">
+          <h3 className="text-lg sm:text-xl font-bold text-sanctuary-slate leading-tight font-nunito mb-3 px-2">
+            {activity.title}
+          </h3>
+          <div className="flex items-center justify-center gap-2 px-4 py-2 bg-white/60 backdrop-blur-sm rounded-full border border-white/80 shadow-sm">
+            <Clock size={16} className="text-sanctuary-sage" />
+            <span className="text-sm font-semibold text-sanctuary-slate font-quicksand">{activity.duration}</span>
+          </div>
+        </div>
+
+        {/* Action button */}
+        <motion.button
+          onClick={() => onStart(activity)}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className={`w-full py-3 sm:py-3.5 rounded-2xl font-bold text-sm sm:text-base transition-all duration-300 shadow-lg ${
+            isCompleted
+              ? 'bg-gradient-to-r from-sanctuary-sage/80 to-teal-600/80 text-white hover:from-sanctuary-sage hover:to-teal-600'
+              : isIncomplete
+              ? 'bg-gradient-to-r from-yellow-400 to-amber-500 text-white hover:from-yellow-500 hover:to-amber-600'
+              : 'bg-gradient-to-r from-sanctuary-sage to-teal-600 text-white hover:from-teal-600 hover:to-sanctuary-sage'
+          }`}
+        >
+          {isIncomplete ? '▶ Resume' : isCompleted ? '↻ Repeat' : '→ Begin'}
+        </motion.button>
+      </div>
     </motion.div>
   );
 }

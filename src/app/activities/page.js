@@ -151,14 +151,14 @@ export default function ActivitiesPage() {
 
   return (
     <>
-      <div className="min-h-screen bg-sanctuary-sand">
+      <div className="min-h-screen mesh-gradient-sanctuary relative">
         <Navigation currentPage="activities" />
 
         <motion.main
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
-          className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8"
+          className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12"
         >
           <AnimatePresence>
             {error && (
@@ -177,27 +177,46 @@ export default function ActivitiesPage() {
             )}
           </AnimatePresence>
 
-          <header className="mb-8">
-            <h1 className="text-4xl font-bold text-sanctuary-slate font-quicksand">Your Daily Wellness</h1>
-            <p className="text-sanctuary-slate/70 mt-1 font-nunito">Select an activity to begin your mindful moment.</p>
+          <header className="mb-10 sm:mb-12 text-center">
+            <motion.h1 
+              initial={{ y: -20 }}
+              animate={{ y: 0 }}
+              className="text-4xl sm:text-5xl md:text-6xl font-bold text-sanctuary-slate font-nunito mb-3 leading-tight"
+            >
+              Your Daily Wellness
+            </motion.h1>
+            <motion.p 
+              initial={{ y: -10, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.1 }}
+              className="text-lg sm:text-xl text-sanctuary-slate/70 font-quicksand"
+            >
+              Choose an activity to nurture your mind and body
+            </motion.p>
           </header>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-            <div className="lg:col-span-1 lg:sticky top-8">
-              <ActivityProgress completed={completedCount} total={totalCount} />
+          <div className="grid grid-cols-1 xl:grid-cols-4 gap-6 lg:gap-8 items-start">
+            {/* Progress Card - Sticky on large screens */}
+            <div className="xl:col-span-1 order-1">
+              <div className="xl:sticky xl:top-24">
+                <ActivityProgress completed={completedCount} total={totalCount} />
+              </div>
             </div>
             
-            <div className="lg:col-span-2">
+            {/* Activities Grid */}
+            <div className="xl:col-span-3 order-2">
                 {dataLoading ? (
-                    <div className="flex justify-center items-center h-64 neumorphic rounded-3xl"><Loader2 className="h-8 w-8 animate-spin text-sanctuary-sage"/></div>
-                ) : activities.length > 0 ? (
+                    <div className="flex justify-center items-center h-64 frosted-glass rounded-3xl">
+                      <Loader2 className="h-10 w-10 animate-spin text-sanctuary-sage"/>
+                    </div>
+                ) : displayedActivities.length > 0 ? (
                     <motion.div 
-                        className="grid grid-cols-2 md:grid-cols-3 gap-6"
-                        variants={{ visible: { transition: { staggerChildren: 0.07 } } }}
+                        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"
+                        variants={{ visible: { transition: { staggerChildren: 0.08 } } }}
                         initial="hidden"
                         animate="visible"
                     >
-                        {activities.map(activity => (
+                        {displayedActivities.map(activity => (
                             <ActivityCard
                                 key={activity.id}
                                 activity={activity}
@@ -239,42 +258,88 @@ const ActivityProgress = ({ completed, total }) => {
     const percentage = total > 0 ? (completed / total) * 100 : 0;
     
     return(
-        <motion.div layout className="neumorphic rounded-3xl p-6">
-            <h2 className="text-xl font-semibold text-sanctuary-slate mb-4 font-quicksand">Today's Progress</h2>
-            <div className="space-y-4">
-                <div className="w-full bg-sanctuary-misty/40 rounded-full h-2.5">
-                    <motion.div
-                        className="bg-gradient-to-r from-sanctuary-sage to-[#52796F] h-2.5 rounded-full"
-                        initial={{ width: 0 }}
-                        animate={{ width: `${percentage}%` }}
-                        transition={{ duration: 0.8, ease: "easeInOut" }}
-                    />
-                </div>
-                <div className="flex justify-between text-sm font-medium text-sanctuary-slate/80 font-nunito">
-                    <span>{completed}/{total} Completed</span>
-                    <span>{Math.round(percentage)}%</span>
-                </div>
+        <motion.div 
+          layout 
+          initial={{ x: -20, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          className="frosted-glass rounded-3xl p-6 sm:p-8 border-2 border-white/40 shadow-xl"
+        >
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-sanctuary-sage to-teal-600 flex items-center justify-center shadow-lg">
+                <span className="text-2xl">📊</span>
+              </div>
+              <h2 className="text-2xl font-bold text-sanctuary-slate font-nunito">Today's Progress</h2>
             </div>
-            <div className="mt-6 space-y-3">
-                 <InsightCard icon={CheckCircle} title="Completed" value={`${completed} Activities`} color="text-sanctuary-sage" />
-                 <InsightCard icon={ListTodo} title="Remaining" value={`${total - completed} Activities`} color="text-[#52796F]" />
+            
+            {/* Circular Progress */}
+            <div className="relative w-40 h-40 mx-auto mb-6">
+              <svg className="transform -rotate-90" width="160" height="160">
+                <circle
+                  cx="80"
+                  cy="80"
+                  r="70"
+                  stroke="currentColor"
+                  strokeWidth="12"
+                  fill="none"
+                  className="text-sanctuary-misty/30"
+                />
+                <motion.circle
+                  cx="80"
+                  cy="80"
+                  r="70"
+                  stroke="url(#gradient)"
+                  strokeWidth="12"
+                  fill="none"
+                  strokeLinecap="round"
+                  initial={{ strokeDasharray: '0 440' }}
+                  animate={{ strokeDasharray: `${percentage * 4.4} 440` }}
+                  transition={{ duration: 1, ease: 'easeOut' }}
+                />
+                <defs>
+                  <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#84A98C" />
+                    <stop offset="100%" stopColor="#0d9488" />
+                  </linearGradient>
+                </defs>
+              </svg>
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <span className="text-4xl font-bold text-sanctuary-slate font-nunito">{Math.round(percentage)}%</span>
+                <span className="text-sm text-sanctuary-slate/60 font-quicksand">{completed}/{total}</span>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+                 <InsightCard icon={CheckCircle} title="Completed" value={`${completed} ${completed === 1 ? 'Activity' : 'Activities'}`} color="text-sanctuary-sage" bgColor="from-sanctuary-sage/20 to-teal-500/20" />
+                 <InsightCard icon={ListTodo} title="Remaining" value={`${total - completed} ${(total - completed) === 1 ? 'Activity' : 'Activities'}`} color="text-sanctuary-slate" bgColor="from-sanctuary-misty/40 to-sanctuary-sand/60" />
             </div>
         </motion.div>
     );
 };
 
-const InsightCard = ({ icon: Icon, title, value, color }) => (
-  <div className="flex items-center space-x-4 bg-sanctuary-sand rounded-3xl border border-sanctuary-misty/30 p-3 shadow-sanctuary">
-    <div className={`p-2 rounded-full bg-white shadow-sanctuary ${color}`}><Icon size={18} /></div>
-    <div>
-      <h3 className="text-sm text-sanctuary-slate/70 font-nunito">{title}</h3>
-      <p className={`text-lg font-bold ${color}`}>{value}</p>
+const InsightCard = ({ icon: Icon, title, value, color, bgColor }) => (
+  <motion.div 
+    whileHover={{ x: 5 }}
+    className={`flex items-center space-x-4 bg-gradient-to-r ${bgColor} rounded-2xl border border-white/40 p-4 backdrop-blur-sm shadow-lg`}
+  >
+    <div className={`p-3 rounded-xl bg-white/80 backdrop-blur-sm shadow-lg ${color}`}>
+      <Icon size={20} strokeWidth={2.5} />
     </div>
-  </div>
+    <div className="flex-1">
+      <h3 className="text-xs font-medium text-sanctuary-slate/60 font-quicksand uppercase tracking-wide">{title}</h3>
+      <p className={`text-base sm:text-lg font-bold ${color} font-nunito`}>{value}</p>
+    </div>
+  </motion.div>
 );
 
 const EmptyState = ({ message }) => (
-  <div className="text-center py-20 neumorphic rounded-3xl">
-      <p className="text-sanctuary-slate/70 font-nunito">{message}</p>
-  </div>
+  <motion.div 
+    initial={{ scale: 0.9, opacity: 0 }}
+    animate={{ scale: 1, opacity: 1 }}
+    className="text-center py-20 frosted-glass rounded-3xl border-2 border-white/40"
+  >
+      <div className="w-20 h-20 rounded-full bg-gradient-to-br from-sanctuary-sage/30 to-sanctuary-misty/40 flex items-center justify-center mx-auto mb-4">
+        <span className="text-4xl">🌿</span>
+      </div>
+      <p className="text-xl text-sanctuary-slate/70 font-quicksand">{message}</p>
+  </motion.div>
 );

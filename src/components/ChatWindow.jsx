@@ -203,7 +203,7 @@ const FormattedMessage = ({ text, sender, buttons }) => {
 const Avatar = ({ sender }) => {
   if (sender === 'user') {
     return (
-      <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold text-sm">
+      <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold text-xs sm:text-sm flex-shrink-0">
         U
       </div>
     );
@@ -211,7 +211,7 @@ const Avatar = ({ sender }) => {
   
   // Handle both 'ai' and 'assistant' sender types
   return (
-    <div className="w-8 h-8 rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 flex items-center justify-center text-white font-semibold text-sm">
+    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 flex items-center justify-center text-white font-semibold text-sm sm:text-base flex-shrink-0">
       🧠
     </div>
   );
@@ -320,14 +320,14 @@ export default function ChatWindow({ messages = [], onSend, isLoading = false, a
   return (
     <div className="flex flex-col h-full bg-sanctuary-sand rounded-3xl shadow-sanctuary border border-sanctuary-misty/30">
       {/* Header - Glassmorphism */}
-      <div className="glass-morphism text-sanctuary-slate p-5 rounded-t-3xl border-b border-sanctuary-misty/20">
-        <div className="flex items-center justify-center space-x-3">
-          <div className="w-12 h-12 rounded-3xl bg-sanctuary-sage/20 flex items-center justify-center transition-sanctuary hover:bg-sanctuary-sage/30">
-            <span className="text-2xl">🌿</span>
+      <div className="glass-morphism text-sanctuary-slate p-3 sm:p-4 md:p-5 rounded-t-3xl border-b border-sanctuary-misty/20">
+        <div className="flex items-center justify-center space-x-2 sm:space-x-3">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl sm:rounded-3xl bg-sanctuary-sage/20 flex items-center justify-center transition-sanctuary hover:bg-sanctuary-sage/30">
+            <span className="text-xl sm:text-2xl">🌿</span>
           </div>
           <div className="text-center">
-            <h3 className="font-quicksand font-semibold text-xl text-sanctuary-slate">Mental Buddy</h3>
-            <p className="text-sanctuary-slate/70 text-sm leading-relaxed">Your Digital Sanctuary</p>
+            <h3 className="font-quicksand font-semibold text-lg sm:text-xl text-sanctuary-slate">Mental Buddy</h3>
+            <p className="text-sanctuary-slate/70 text-xs sm:text-sm leading-relaxed">Your Digital Sanctuary</p>
           </div>
         </div>
       </div>
@@ -336,37 +336,38 @@ export default function ChatWindow({ messages = [], onSend, isLoading = false, a
       <div 
         ref={messagesContainerRef}
         onScroll={handleScroll}
-        className="flex-1 overflow-y-auto p-6 space-y-6 min-h-0 sanctuary-scrollbar relative bg-sanctuary-sand" 
-        style={{ maxHeight: 'calc(100vh - 250px)' }}
+        className="flex-1 overflow-y-auto p-3 sm:p-4 md:p-6 space-y-4 sm:space-y-6 min-h-0 sanctuary-scrollbar relative bg-sanctuary-sand"
       >
         {messages.length === 0 ? (
-          <div className="text-center text-sanctuary-slate mt-12">
-            <div className="w-24 h-24 bg-sanctuary-sage/10 rounded-3xl flex items-center justify-center text-4xl mx-auto mb-6 neumorphic">
+          <div className="text-center text-sanctuary-slate mt-6 sm:mt-12 px-2">
+            <div className="w-16 h-16 sm:w-24 sm:h-24 bg-sanctuary-sage/10 rounded-2xl sm:rounded-3xl flex items-center justify-center text-3xl sm:text-4xl mx-auto mb-4 sm:mb-6 neumorphic">
               🌿
             </div>
-            <h3 className="text-2xl font-quicksand font-semibold mb-3 text-sanctuary-slate">Welcome to Your Digital Sanctuary</h3>
-            <p className="text-sanctuary-slate/70 max-w-md mx-auto leading-loose font-nunito">
+            <h3 className="text-xl sm:text-2xl font-quicksand font-semibold mb-2 sm:mb-3 text-sanctuary-slate px-2">Welcome to Your Digital Sanctuary</h3>
+            <p className="text-sanctuary-slate/70 max-w-md mx-auto leading-relaxed sm:leading-loose font-nunito text-sm sm:text-base px-2">
               This is your safe, private space for mental wellness. 
               Share what's on your mind—I'm here to listen without judgment.
             </p>
-            <div className="mt-8 flex flex-wrap justify-center gap-3">
-              <span className="bg-sanctuary-sage/20 text-sanctuary-slate px-4 py-2 rounded-3xl text-sm font-quicksand transition-sanctuary hover:bg-sanctuary-sage/30">🔒 Confidential</span>
-              <span className="bg-sanctuary-misty/30 text-sanctuary-slate px-4 py-2 rounded-3xl text-sm font-quicksand transition-sanctuary hover:bg-sanctuary-misty/50">💚 Empathetic</span>
-              <span className="bg-sanctuary-sage-light/20 text-sanctuary-slate px-4 py-2 rounded-3xl text-sm font-quicksand transition-sanctuary hover:bg-sanctuary-sage-light/30">🤝 Non-judgmental</span>
+            <div className="mt-6 sm:mt-8 flex flex-wrap justify-center gap-2 sm:gap-3 px-2">
+              <span className="bg-sanctuary-sage/20 text-sanctuary-slate px-3 py-1.5 sm:px-4 sm:py-2 rounded-2xl sm:rounded-3xl text-xs sm:text-sm font-quicksand transition-sanctuary hover:bg-sanctuary-sage/30">🔒 Confidential</span>
+              <span className="bg-sanctuary-misty/30 text-sanctuary-slate px-3 py-1.5 sm:px-4 sm:py-2 rounded-2xl sm:rounded-3xl text-xs sm:text-sm font-quicksand transition-sanctuary hover:bg-sanctuary-misty/50">💚 Empathetic</span>
+              <span className="bg-sanctuary-sage-light/20 text-sanctuary-slate px-3 py-1.5 sm:px-4 sm:py-2 rounded-2xl sm:rounded-3xl text-xs sm:text-sm font-quicksand transition-sanctuary hover:bg-sanctuary-sage-light/30">🤝 Non-judgmental</span>
             </div>
           </div>
         ) : (
           messages.map((message, index) => (
             <div
               key={index}
-              className={`flex items-start space-x-3 ${
+              className={`flex items-start space-x-2 sm:space-x-3 ${
                 message.sender === 'user' ? 'flex-row-reverse space-x-reverse' : ''
               }`}
             >
-              <Avatar sender={message.sender} />
-              <div className={`flex flex-col ${message.sender === 'user' ? 'items-end' : 'items-start'}`}>
+              <div className="flex-shrink-0">
+                <Avatar sender={message.sender} />
+              </div>
+              <div className={`flex flex-col min-w-0 flex-1 ${message.sender === 'user' ? 'items-end' : 'items-start'}`}>
                 <div
-                  className={`max-w-lg px-6 py-4 rounded-3xl shadow-sanctuary transition-sanctuary ${
+                  className={`max-w-full sm:max-w-md lg:max-w-lg px-4 sm:px-6 py-3 sm:py-4 rounded-2xl sm:rounded-3xl shadow-sanctuary transition-sanctuary ${
                     message.sender === 'user'
                       ? 'bg-[#52796F] text-white rounded-br-md shadow-lg'
                       : 'neumorphic text-sanctuary-slate rounded-bl-md'
@@ -380,7 +381,7 @@ export default function ChatWindow({ messages = [], onSend, isLoading = false, a
                   {voiceSupported && (
                     <button
                       onClick={() => handleReadAloud(message.text)}
-                      className={`mt-2 flex items-center space-x-1 text-xs ${
+                      className={`mt-1.5 sm:mt-2 flex items-center space-x-1 text-xs ${
                         message.sender === 'user' 
                           ? 'text-white/80 hover:text-white' 
                           : 'text-slate-500 hover:text-slate-700'
@@ -405,13 +406,13 @@ export default function ChatWindow({ messages = [], onSend, isLoading = false, a
                     </button>
                   )}
                 </div>
-                <div className={`mt-2 px-2 ${
+                <div className={`mt-1 sm:mt-2 px-1 sm:px-2 ${
                   message.sender === 'user' ? 'text-right' : 'text-left'
                 }`}>
                   <span className="text-xs text-sanctuary-slate/60 font-quicksand font-medium">
-                    {message.sender === 'user' ? 'You' : 'Your Companion •'}
+                    {message.sender === 'user' ? 'You' : 'Your Companion'}
                   </span>
-                  <span className="text-xs text-sanctuary-slate/40 ml-2 font-nunito">
+                  <span className="text-xs text-sanctuary-slate/40 ml-1 sm:ml-2 font-nunito">
                     {message.timestamp}
                   </span>
                 </div>
@@ -422,20 +423,22 @@ export default function ChatWindow({ messages = [], onSend, isLoading = false, a
         
         {/* Loading indicator */}
         {isLoading && (
-          <div className="flex items-start space-x-3">
-            <Avatar sender="assistant" />
-            <div className="flex flex-col">
-              <div className="neumorphic px-6 py-4 rounded-3xl rounded-bl-md">
-                <div className="flex items-center space-x-3">
+          <div className="flex items-start space-x-2 sm:space-x-3">
+            <div className="flex-shrink-0">
+              <Avatar sender="assistant" />
+            </div>
+            <div className="flex flex-col min-w-0 flex-1">
+              <div className="neumorphic px-4 sm:px-6 py-3 sm:py-4 rounded-2xl sm:rounded-3xl rounded-bl-md">
+                <div className="flex items-center space-x-2 sm:space-x-3">
                   <div className="flex space-x-1">
                     <div className="w-2.5 h-2.5 bg-sanctuary-sage rounded-full animate-bounce"></div>
                     <div className="w-2.5 h-2.5 bg-sanctuary-sage rounded-full animate-bounce" style={{ animationDelay: '0.15s' }}></div>
                     <div className="w-2.5 h-2.5 bg-sanctuary-sage rounded-full animate-bounce" style={{ animationDelay: '0.3s' }}></div>
                   </div>
-                  <span className="text-sm text-sanctuary-slate/70 font-nunito">Reflecting on your message...</span>
+                  <span className="text-xs sm:text-sm text-sanctuary-slate/70 font-nunito">Reflecting...</span>
                 </div>
               </div>
-              <div className="mt-2 px-2">
+              <div className="mt-1 sm:mt-2 px-1 sm:px-2">
                 <span className="text-xs text-sanctuary-slate/60 font-quicksand font-medium">Your Companion</span>
               </div>
             </div>
@@ -448,10 +451,10 @@ export default function ChatWindow({ messages = [], onSend, isLoading = false, a
         {showScrollButton && (
           <button
             onClick={scrollToBottom}
-            className="absolute bottom-6 right-6 bg-sanctuary-sage hover:bg-sanctuary-sage-dark text-black p-3 rounded-3xl shadow-sanctuary hover:shadow-sanctuary-hover transition-sanctuary z-10 touch-target"
+            className="absolute bottom-3 right-3 sm:bottom-6 sm:right-6 bg-sanctuary-sage hover:bg-sanctuary-sage-dark text-black p-2 sm:p-3 rounded-2xl sm:rounded-3xl shadow-sanctuary hover:shadow-sanctuary-hover transition-sanctuary z-10 touch-target"
             title="Scroll to bottom"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
             </svg>
           </button>
@@ -459,24 +462,24 @@ export default function ChatWindow({ messages = [], onSend, isLoading = false, a
       </div>
 
       {/* Input Area - Fixed at bottom with glassmorphism */}
-      <div className="border-t border-sanctuary-misty/20 p-6 flex-shrink-0 glass-morphism rounded-b-3xl">
+      <div className="border-t border-sanctuary-misty/20 p-3 sm:p-4 md:p-6 flex-shrink-0 glass-morphism rounded-b-3xl">
         {/* Voice Input Status */}
         {isListening && (
-          <div className="mb-3 flex items-center justify-center space-x-2 text-sm text-sanctuary-sage animate-pulse">
-            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+          <div className="mb-2 sm:mb-3 flex items-center justify-center space-x-2 text-xs sm:text-sm text-sanctuary-sage animate-pulse">
+            <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 006 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z" clipRule="evenodd" />
             </svg>
             <span className="font-quicksand font-medium">Listening... Speak now</span>
           </div>
         )}
         
-        <div className="flex space-x-3">
+        <div className="flex space-x-2 sm:space-x-3">
           {/* Voice Input Button */}
           {voiceSupported && (
             <button
               onClick={isListening ? stopListening : handleVoiceSend}
               disabled={isLoading}
-              className={`px-4 py-3 rounded-3xl font-quicksand font-medium shadow-lg transition-sanctuary flex items-center space-x-2 touch-target ${
+              className={`px-3 py-2.5 sm:px-4 sm:py-3 rounded-2xl sm:rounded-3xl font-quicksand font-medium shadow-lg transition-sanctuary flex items-center space-x-1.5 sm:space-x-2 touch-target text-sm sm:text-base ${
                 isListening
                   ? 'bg-red-500 hover:bg-red-600 text-white pulse-gentle'
                   : 'bg-[#52796F] hover:bg-[#3d5a52] text-white shadow-sanctuary-hover'
@@ -485,14 +488,14 @@ export default function ChatWindow({ messages = [], onSend, isLoading = false, a
             >
               {isListening ? (
                 <>
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8 7a1 1 0 00-1 1v4a1 1 0 002 0V8a1 1 0 00-1-1zm4 0a1 1 0 00-1 1v4a1 1 0 002 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
                   </svg>
                   <span className="hidden sm:inline">Stop</span>
                 </>
               ) : (
                 <>
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 006 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z" clipRule="evenodd" />
                   </svg>
                   <span className="hidden sm:inline">Voice</span>
@@ -508,12 +511,12 @@ export default function ChatWindow({ messages = [], onSend, isLoading = false, a
             onKeyPress={handleKeyPress}
             placeholder="Share what's on your mind..."
             disabled={isListening}
-            className="flex-1 px-6 py-3 border border-sanctuary-misty/40 text-sanctuary-slate rounded-full focus:outline-none focus-sanctuary transition-sanctuary bg-white/90 shadow-sanctuary disabled:bg-sanctuary-misty/20 disabled:cursor-not-allowed font-nunito leading-relaxed placeholder:text-sanctuary-slate/40"
+            className="flex-1 min-w-0 px-4 py-2.5 sm:px-6 sm:py-3 border border-sanctuary-misty/40 text-sanctuary-slate rounded-full focus:outline-none focus-sanctuary transition-sanctuary bg-white/90 shadow-sanctuary disabled:bg-sanctuary-misty/20 disabled:cursor-not-allowed font-nunito leading-relaxed placeholder:text-sanctuary-slate/40 text-sm sm:text-base"
           />
           <button
             onClick={handleSend}
             disabled={!inputMessage.trim() || isLoading || isListening}
-            className={`w-14 h-14 flex items-center justify-center bg-[#52796F] text-white rounded-full hover:bg-[#3d5a52] disabled:bg-sanctuary-misty/50 disabled:cursor-not-allowed transition-sanctuary shadow-lg hover:shadow-xl touch-target flex-shrink-0 ${
+            className={`w-11 h-11 sm:w-14 sm:h-14 flex items-center justify-center bg-[#52796F] text-white rounded-full hover:bg-[#3d5a52] disabled:bg-sanctuary-misty/50 disabled:cursor-not-allowed transition-sanctuary shadow-lg hover:shadow-xl touch-target flex-shrink-0 ${
               inputMessage.trim() && !isLoading && !isListening ? 'pulse-gentle' : ''
             }`}
             title="Send message"
@@ -521,11 +524,11 @@ export default function ChatWindow({ messages = [], onSend, isLoading = false, a
             {isLoading ? (
               <div className="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
             ) : (
-              <SendHorizonal className="w-6 h-6" />
+              <SendHorizonal className="w-5 h-5 sm:w-6 sm:h-6" />
             )}
           </button>
         </div>
-        <div className="mt-3 text-xs text-sanctuary-slate/50 text-center flex items-center justify-center space-x-2 font-nunito">
+        <div className="mt-2 sm:mt-3 text-xs text-sanctuary-slate/50 text-center flex flex-wrap items-center justify-center gap-1 sm:gap-2 font-nunito">
           <span className="flex items-center space-x-1">
             <span>🔒</span>
             <span>Your conversations are private and confidential</span>
