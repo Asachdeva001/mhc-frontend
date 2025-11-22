@@ -1,139 +1,175 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../lib/authContext';
 import { useRouter } from 'next/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
+import { LayoutDashboard, MessageSquare, PlusCircle, Gamepad2, Leaf, LogOut, ChevronDown, Menu, X } from 'lucide-react';
+
+// A cleaner way to manage navigation links
+const navLinks = [
+  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, pageName: 'dashboard' },
+  { href: '/chat', label: 'Chat', icon: MessageSquare, pageName: 'chat' },
+  { href: '/activities', label: 'Activities', icon: PlusCircle, pageName: 'activities' },
+  { href: '/anti-stress-games', label: 'Games', icon: Gamepad2, pageName: 'anti-stress-games' },
+];
 
 export default function Navigation({ currentPage = '' }) {
   const { user, isAuthenticated, loading, signOut } = useAuth();
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const router = useRouter();
+  const userMenuRef = useRef(null);
+  const mobileMenuRef = useRef(null);
 
   const handleSignOut = async () => {
-    try {
-      await signOut();
-      router.push('/');
-    } catch (error) {
-      console.error('Sign out error:', error);
-    }
+    await signOut();
+    router.push('/');
   };
 
-  // Don't show navigation on auth pages
-  if (currentPage === 'auth') {
-    return null;
+  // Hook to close menus when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
+        setShowUserMenu(false);
+      }
+      if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target)) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  if (currentPage === 'auth' || loading) {
+    return null; // Don't show nav on auth pages or during initial auth load
   }
 
   return (
-    <div className="bg-white shadow-sm border-b">
-      <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <Link 
-            href="/" 
-            className="text-blue-500 hover:text-blue-600 font-semibold"
-          >
-            ← Mental Buddy
-          </Link>
-          {isAuthenticated && (
-            <h1 className="text-2xl font-bold text-gray-800">
-              {currentPage === 'chat' && 'Chat'}
-              {currentPage === 'activities' && 'Activities'}
-              {currentPage === 'dashboard' && 'Dashboard'}
-            </h1>
-          )}
-        </div>
-
-        <div className="flex items-center space-x-4">
-          {loading ? (
-            <div className="text-gray-500">Loading...</div>
-          ) : isAuthenticated ? (
-            <>
-              {/* Navigation Links */}
-              <div className="hidden md:flex space-x-2">
-              <Link
-                  href="/dashboard"
-                  className={`px-4 py-2 rounded-lg transition-colors ${
-                    currentPage === 'dashboard' 
-                      ? 'bg-purple-500 text-white' 
-                      : 'bg-purple-100 text-purple-700 hover:bg-purple-200'
-                  }`}
-                >
-                  Dashboard
-                </Link>
+    <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-slate-200/80">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
+          
+          {/* Logo and Desktop Nav Links */}
+          <div className="flex items-center space-x-8">
+            <Link href={isAuthenticated ? "/dashboard" : "/"} className="flex items-center space-x-2 text-slate-800">
+              <Leaf className="h-6 w-6 text-teal-600" />
+              <span className="font-semibold text-lg">Mental Buddy</span>
+            </Link>
+            <div className="hidden md:flex items-center space-x-2">
+              {isAuthenticated && navLinks.map((link) => (
                 <Link
-                  href="/chat"
-                  className={`px-4 py-2 rounded-lg transition-colors ${
-                    currentPage === 'chat' 
-                      ? 'bg-blue-500 text-white' 
-                      : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
+                  key={link.href}
+                  href={link.href}
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                    currentPage === link.pageName
+                      ? 'bg-teal-50 text-teal-600'
+                      : 'text-slate-600 hover:bg-slate-100'
                   }`}
                 >
-                  Chat
+                  <link.icon size={16} />
+                  <span>{link.label}</span>
                 </Link>
-                <Link
-                  href="/activities"
-                  className={`px-4 py-2 rounded-lg transition-colors ${
-                    currentPage === 'activities' 
-                      ? 'bg-green-500 text-white' 
-                      : 'bg-green-100 text-green-700 hover:bg-green-200'
-                  }`}
-                >
-                  Activities
-                </Link>
-                
-              </div>
+              ))}
+            </div>
+          </div>
 
-              {/* User Menu */}
-              <div className="relative">
+          {/* Right side: User Menu or Sign In buttons */}
+          <div className="flex items-center">
+            {isAuthenticated ? (
+              <div className="relative" ref={userMenuRef}>
                 <button
                   onClick={() => setShowUserMenu(!showUserMenu)}
-                  className="flex items-center space-x-2 text-gray-700 hover:text-gray-900 transition-colors"
+                  className="flex items-center space-x-2 p-1 rounded-full hover:bg-slate-100 transition-colors"
                 >
-                  <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-semibold">
+                  <div className="w-9 h-9 bg-teal-100 rounded-full flex items-center justify-center text-teal-700 font-semibold">
                     {user?.name?.charAt(0) || user?.email?.charAt(0) || 'U'}
                   </div>
-                  <span className="hidden md:block text-sm font-medium">
-                    {user?.name || user?.email}
+                  <span className="hidden md:block text-sm font-medium text-slate-700">
+                    {user?.name?.split(' ')[0] || user?.email}
                   </span>
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
+                  <ChevronDown size={16} className="text-slate-500" />
                 </button>
-
-                {showUserMenu && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
-                    <div className="px-4 py-2 border-b border-gray-100">
-                      <p className="text-sm font-medium text-gray-900">{user?.name}</p>
-                      <p className="text-xs text-gray-500">{user?.email}</p>
-                    </div>
-                    <button
-                      onClick={handleSignOut}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                <AnimatePresence>
+                  {showUserMenu && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute right-0 mt-2 w-56 origin-top-right bg-white rounded-xl shadow-lg border border-slate-200/80 focus:outline-none"
                     >
-                      Sign out
-                    </button>
-                  </div>
+                      <div className="py-1">
+                        <div className="px-4 py-3 border-b border-slate-100">
+                          <p className="text-sm font-semibold text-slate-800 truncate">{user?.name}</p>
+                          <p className="text-xs text-slate-500 truncate">{user?.email}</p>
+                        </div>
+                        <button
+                          onClick={handleSignOut}
+                          className="w-full flex items-center space-x-2 text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                        >
+                          <LogOut size={14} />
+                          <span>Sign out</span>
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            ) : (
+              <div className="hidden md:flex items-center space-x-2">
+                <Link href="/auth/signin" className="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-full transition-colors">Sign In</Link>
+                <Link href="/auth/signup" className="px-4 py-2 text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 rounded-full transition-colors">Sign Up</Link>
+              </div>
+            )}
+            {/* Mobile Menu Button */}
+            <div className="md:hidden ml-2" ref={mobileMenuRef}>
+              <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="p-2 rounded-full text-slate-600 hover:bg-slate-100">
+                {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile Menu Dropdown */}
+        <AnimatePresence>
+          {isMobileMenuOpen && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="md:hidden overflow-hidden"
+            >
+              <div className="pt-2 pb-4 space-y-1">
+                {isAuthenticated ? (
+                  navLinks.map((link) => (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className={`flex items-center space-x-3 px-3 py-2 rounded-lg text-base font-medium transition-colors ${
+                        currentPage === link.pageName
+                          ? 'bg-teal-50 text-teal-600'
+                          : 'text-slate-600 hover:bg-slate-100'
+                      }`}
+                    >
+                      <link.icon size={20} />
+                      <span>{link.label}</span>
+                    </Link>
+                  ))
+                ) : (
+                  <>
+                    <Link href="/auth/signin" onClick={() => setIsMobileMenuOpen(false)} className="block w-full text-left px-4 py-2 text-base font-medium text-slate-600 hover:bg-slate-100 rounded-lg">Sign In</Link>
+                    {/* --- FIX: Corrected the closing tag --- */}
+                    <Link href="/auth/signup" onClick={() => setIsMobileMenuOpen(false)} className="block w-full text-left px-4 py-2 text-base font-medium text-white bg-teal-600 hover:bg-teal-700 rounded-lg">Sign Up</Link>
+                  </>
                 )}
               </div>
-            </>
-          ) : (
-            <div className="flex space-x-2">
-              <Link
-                href="/auth/signin"
-                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-              >
-                Sign In
-              </Link>
-              <Link
-                href="/auth/signup"
-                className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
-              >
-                Sign Up
-              </Link>
-            </div>
+            </motion.div>
           )}
-        </div>
+        </AnimatePresence>
       </div>
-    </div>
+    </nav>
   );
 }
