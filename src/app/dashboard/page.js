@@ -179,10 +179,10 @@ export default function DashboardPage() {
               className="mb-6 p-4 bg-red-100 border border-red-300 rounded-2xl flex items-center justify-between shadow-sm"
             >
               <div className="flex items-center">
-                <AlertTriangle className="h-5 w-5 text-red-600 mr-3" />
-                <span className="text-red-800 font-medium">{error}</span>
+                <AlertTriangle className="h-5 w-5 text-red-500 mr-3" />
+                <span className="text-red-700 font-quicksand font-medium">{error}</span>
               </div>
-              <button onClick={() => setError('')} className="text-red-600 hover:text-red-800"><X size={20} /></button>
+              <button onClick={() => setError('')} className="text-red-500 hover:text-red-700 transition-sanctuary"><X size={20} /></button>
             </motion.div>
           )}
         </AnimatePresence>
@@ -318,13 +318,13 @@ const DailyCheckin = ({ todayMood, onMoodLogged }) => {
   }
 
   return (
-    <motion.div layout className="bg-white/60 backdrop-blur-lg rounded-2xl shadow-sm border border-slate-200/80 p-6">
-      <h2 className="text-xl font-semibold text-slate-800 mb-4 text-center">How are you feeling now?</h2>
+    <motion.div layout className="neumorphic rounded-3xl p-6">
+      <h2 className="text-xl font-semibold text-sanctuary-slate mb-4 text-center font-quicksand">How are you feeling now?</h2>
       <div className="flex justify-around items-center mb-6">
         {moodOptions.map(({ mood, emoji }) => (
           <motion.button key={mood} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
             onClick={() => handleMoodSelect(mood)}
-            className={`text-3xl p-3 rounded-full transition ${newMood.level === mood && showForm ? 'bg-teal-100 ring-2 ring-teal-500' : 'hover:bg-slate-100'}`}
+            className={`text-3xl p-3 rounded-full transition-sanctuary ${newMood.level === mood && showForm ? 'bg-sanctuary-sage/20 ring-2 ring-sanctuary-sage shadow-sanctuary' : 'hover:bg-sanctuary-misty/30'}`}
           >
             {emoji}
           </motion.button>
@@ -348,14 +348,14 @@ const DailyCheckin = ({ todayMood, onMoodLogged }) => {
               <SliderInput label="Sleep" icon={Bed} min={0} max={12} value={newMood.sleep} onChange={(v) => setNewMood({ ...newMood, sleep: v })} color="bg-indigo-500" />
             </div>
             <textarea value={newMood.note} onChange={(e) => setNewMood({ ...newMood, note: e.target.value })}
-              placeholder="What’s contributing to this feeling?" rows="3" required
-              className="w-full text-gray-500 rounded-xl p-3 border transition bg-slate-50" />
+              placeholder="What's contributing to this feeling?" rows="3" required
+              className="w-full text-sanctuary-slate rounded-3xl p-3 border border-sanctuary-misty/40 transition-sanctuary bg-white/90 focus-sanctuary font-nunito placeholder:text-sanctuary-slate/40" />
             {error && <p className="text-sm text-red-600">{error}</p>}
             <div className="flex space-x-2 pt-2">
               <button type="submit" disabled={isLoading} className="flex-1 bg-teal-600 hover:bg-teal-700 text-white font-semibold py-2 rounded-full transition flex items-center justify-center">
                 {isLoading ? <Loader2 className="animate-spin h-5 w-5" /> : 'Save Entry'}
               </button>
-              <button type="button" onClick={() => setShowForm(false)} className="flex-1 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold py-2 rounded-full transition">Cancel</button>
+              <button type="button" onClick={() => setShowForm(false)} className="flex-1 bg-sanctuary-misty/50 hover:bg-sanctuary-misty text-sanctuary-slate font-semibold py-2 rounded-3xl transition-sanctuary touch-target font-quicksand">Cancel</button>
             </div>
           </motion.form>
         )}
@@ -390,8 +390,8 @@ const Insights = ({ insights, moodEntries }) => {
 };
 
 const RecentEntries = ({ entries }) => (
-  <motion.div layout className="bg-white/60 backdrop-blur-lg rounded-2xl shadow-sm border border-slate-200/80 p-6">
-    <h2 className="text-xl font-semibold text-slate-800 mb-4">Recent Entries</h2>
+  <motion.div layout className="neumorphic rounded-3xl p-6">
+    <h2 className="text-xl font-semibold text-sanctuary-slate mb-4 font-quicksand">Recent Entries</h2>
     {entries.length === 0 ? <EmptyState message="Your recent mood entries will appear here." /> : (
       <motion.div className="space-y-3" variants={{ visible: { transition: { staggerChildren: 0.1 } } }} initial="hidden" animate="visible">
         {entries.slice(0, 7).map((entry) => <RecentEntryItem key={entry.id} entry={entry} />)}
@@ -432,10 +432,10 @@ const RecentEntryItem = ({ entry }) => {
 };
 
 const InsightCard = ({ icon: Icon, title, value, color }) => (
-  <div className="flex items-center space-x-4 bg-slate-50/80 p-4 rounded-xl border border-slate-200/60">
-    <div className={`p-3 rounded-full bg-white ${color}`}><Icon size={20} /></div>
+  <div className="flex items-center space-x-4 bg-sanctuary-sand rounded-3xl border border-sanctuary-misty/30 p-4 shadow-sanctuary">
+    <div className={`p-3 rounded-full bg-white shadow-sanctuary ${color}`}><Icon size={20} /></div>
     <div>
-      <h3 className="text-sm text-slate-600">{title}</h3>
+      <h3 className="text-sm text-sanctuary-slate/70 font-nunito">{title}</h3>
       <p className={`text-xl font-bold ${color}`}>{value}</p>
     </div>
   </div>
@@ -443,7 +443,7 @@ const InsightCard = ({ icon: Icon, title, value, color }) => (
 
 const SliderInput = ({ label, icon: Icon, min, max, value, onChange, color }) => (
   <div className="w-full">
-    <label className="flex items-center text-sm font-medium text-slate-600 mb-2">
+    <label className="flex items-center text-sm font-medium text-sanctuary-slate/80 mb-2 font-quicksand">
       <Icon size={14} className="mr-2" /> {label}
     </label>
     <div className="relative flex items-center">
@@ -451,7 +451,7 @@ const SliderInput = ({ label, icon: Icon, min, max, value, onChange, color }) =>
         className={`w-full h-2 rounded-lg cursor-pointer appearance-none ${color}`}
         style={{ backgroundSize: `${(value - min) * 100 / (max - min)}% 100%` }}
       />
-      <span className="text-xs text-slate-500 font-semibold ml-3 w-8 text-right">{value}</span>
+      <span className="text-xs text-sanctuary-slate/70 font-semibold ml-3 w-8 text-right font-nunito">{value}</span>
     </div>
   </div>
 );

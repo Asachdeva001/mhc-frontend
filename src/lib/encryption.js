@@ -112,7 +112,16 @@ class MessageEncryption {
    */
   async decryptMessage(encryptedMessage, password) {
     try {
+      // Validate encrypted message structure
+      if (!encryptedMessage || typeof encryptedMessage !== 'object') {
+        throw new Error('Invalid encrypted message format');
+      }
+
       const { encryptedData, salt, iv } = encryptedMessage;
+      
+      if (!encryptedData || !salt || !iv) {
+        throw new Error('Missing encryption parameters');
+      }
       
       // Convert base64 back to Uint8Array
       const combined = Uint8Array.from(atob(encryptedData), c => c.charCodeAt(0));
@@ -175,15 +184,27 @@ class MessageEncryption {
     const decryptedMessages = [];
     
     for (const message of messages) {
-      if (message.encrypted && message.text && typeof message.text === 'object') {
-        const decryptedMessage = {
-          ...message,
-          text: await this.decryptMessage(message.text, password),
-          encrypted: false
-        };
-        decryptedMessages.push(decryptedMessage);
+      // Check if message is properly encrypted
+      if (message.encrypted && message.text && typeof message.text === 'object' && message.text.encryptedData) {
+        try {
+          const decryptedMessage = {
+            ...message,
+            text: await this.decryptMessage(message.text, password),
+            encrypted: false
+          };
+          decryptedMessages.push(decryptedMessage);
+        } catch (decryptError) {
+          console.warn('Failed to decrypt individual message, keeping original:', decryptError.message);
+          // If decryption fails, keep the message but mark it as potentially corrupted
+          decryptedMessages.push({
+            ...message,
+            text: typeof message.text === 'string' ? message.text : 'Encrypted message (decryption failed)',
+            encrypted: false,
+            decryptionFailed: true
+          });
+        }
       } else {
-        // Message is not encrypted, return as-is
+        // Message is not encrypted or is plain text, return as-is
         decryptedMessages.push(message);
       }
     }
