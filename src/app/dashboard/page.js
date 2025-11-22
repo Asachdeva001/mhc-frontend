@@ -309,7 +309,7 @@ const DailyCheckin = ({ todayMood, onMoodLogged }) => {
   if (todayMood?.hasEntry && !showForm) {
     return (
       <motion.div layout className="bg-white/60 backdrop-blur-lg rounded-2xl shadow-sm border border-slate-200/80 p-6 text-center">
-        <p className="text-lg font-semibold text-emerald-700">You've logged your mood today!</p>
+        <p className="text-lg font-semibold text-emerald-700">You&apos;ve logged your mood today!</p>
         <p className="text-4xl my-3">{moodOptions.find(o => o.mood >= todayMood.moodEntry.mood)?.emoji || '😊'}</p>
         <p className="text-slate-600 italic">“{todayMood.moodEntry.note}”</p>
         <button onClick={() => setShowForm(true)} className="mt-4 text-sm text-teal-600 hover:underline">Update Entry</button>
