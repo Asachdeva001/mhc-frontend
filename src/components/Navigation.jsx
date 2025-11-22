@@ -5,7 +5,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../lib/authContext';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LayoutDashboard, MessageSquare, PlusCircle, Leaf, LogOut, ChevronDown, Menu, X, BookOpen } from 'lucide-react';
+import { LayoutDashboard, MessageSquare, PlusCircle, Leaf, LogOut, ChevronDown, Menu, X, BookOpen, User, Shield, Info } from 'lucide-react';
 
 // A cleaner way to manage navigation links
 const navLinks = [
@@ -97,17 +97,41 @@ export default function Navigation({ currentPage = '' }) {
                       initial={{ opacity: 0, y: -10, scale: 0.95 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                      transition={{ duration: 0.15 }}
-                      className="absolute right-0 mt-2 w-56 origin-top-right neumorphic rounded-3xl focus:outline-none"
+                      transition={{ duration: 0.2 }}
+                      className="absolute right-0 mt-2 w-56 origin-top-right frosted-glass rounded-3xl focus:outline-none shadow-xl"
                     >
                       <div className="py-1">
                         <div className="px-4 py-3 border-b border-sanctuary-misty/30">
                           <p className="text-sm font-semibold text-sanctuary-slate truncate">{user?.name}</p>
                           <p className="text-xs text-sanctuary-slate/60 truncate">{user?.email}</p>
                         </div>
+                        <Link
+                          href="/settings?tab=profile"
+                          onClick={() => setShowUserMenu(false)}
+                          className="w-full flex items-center space-x-2 text-left px-4 py-2 text-sm text-sanctuary-slate hover:bg-sanctuary-misty/30 transition-sanctuary"
+                        >
+                          <User size={14} />
+                          <span>My Profile</span>
+                        </Link>
+                        <Link
+                          href="/settings?tab=data"
+                          onClick={() => setShowUserMenu(false)}
+                          className="w-full flex items-center space-x-2 text-left px-4 py-2 text-sm text-sanctuary-slate hover:bg-sanctuary-misty/30 transition-sanctuary"
+                        >
+                          <Shield size={14} />
+                          <span>Data & Privacy</span>
+                        </Link>
+                        <Link
+                          href="/about"
+                          onClick={() => setShowUserMenu(false)}
+                          className="w-full flex items-center space-x-2 text-left px-4 py-2 text-sm text-sanctuary-slate hover:bg-sanctuary-misty/30 transition-sanctuary border-b border-sanctuary-misty/30"
+                        >
+                          <Info size={14} />
+                          <span>Know More</span>
+                        </Link>
                         <button
                           onClick={handleSignOut}
-                          className="w-full flex items-center space-x-2 text-left px-4 py-2 text-sm text-red-500 hover:bg-red-50/50 transition-sanctuary rounded-2xl"
+                          className="w-full flex items-center space-x-2 text-left px-4 py-2 text-sm text-red-500 hover:bg-red-50/50 transition-sanctuary rounded-b-3xl"
                         >
                           <LogOut size={14} />
                           <span>Sign out</span>

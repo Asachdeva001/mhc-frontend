@@ -247,6 +247,46 @@ export const api = {
     },
   },
 
+  // User settings endpoints
+  user: {
+    getProfile: async () => {
+      return apiCall('/api/user/profile');
+    },
+    
+    updateProfile: async (profileData) => {
+      return apiCall('/api/user/profile', {
+        method: 'PUT',
+        body: JSON.stringify(profileData),
+      });
+    },
+    
+    updatePassword: async (newPassword) => {
+      return apiCall('/api/user/password', {
+        method: 'PUT',
+        body: JSON.stringify({ newPassword }),
+      });
+    },
+    
+    deleteConversations: async () => {
+      return apiCall('/api/user/conversations', {
+        method: 'DELETE',
+      });
+    },
+    
+    deleteJournals: async () => {
+      return apiCall('/api/user/journals', {
+        method: 'DELETE',
+      });
+    },
+    
+    deleteAccount: async (confirmEmail) => {
+      return apiCall('/api/user/account', {
+        method: 'DELETE',
+        body: JSON.stringify({ confirmEmail }),
+      });
+    },
+  },
+
   // Health check
   healthCheck: async () => {
     return apiCall('/health');
