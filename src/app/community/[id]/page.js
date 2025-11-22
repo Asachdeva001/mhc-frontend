@@ -8,7 +8,7 @@ import { useAuth } from '../../../lib/authContext';
 import axios from 'axios';
 import Link from 'next/link';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || '';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || '';
 const DEBUG_API = process.env.NEXT_PUBLIC_DEBUG_API === 'true';
 
 const api = axios.create({
