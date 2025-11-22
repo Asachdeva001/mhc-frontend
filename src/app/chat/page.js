@@ -194,7 +194,8 @@ export default function ChatPage() {
       const aiResponse = {
         text: response.reply,
         sender: 'ai',
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        buttons: response.buttons || undefined // Include buttons if provided
       };
 
       const finalMessages = [...updatedMessages, aiResponse];
@@ -236,7 +237,7 @@ export default function ChatPage() {
         await api.chat.saveConversation(finalMessages, sessionId);
       }
     } finally {
-      setIsAiTyping(false);
+      setIsLoading(false);
     }
   };
 

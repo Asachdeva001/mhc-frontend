@@ -133,16 +133,10 @@ const useVoiceAssistant = () => {
 };
 
 // Component to format assistant messages with better structure
-const FormattedMessage = ({ text, sender }) => {
+const FormattedMessage = ({ text, sender, buttons }) => {
   if (sender === 'user') {
     return <p className="leading-relaxed">{text}</p>;
   }
-
-
-
-
-
-
 
   // Format assistant messages
   const formatAssistantMessage = (message) => {
@@ -182,6 +176,25 @@ const FormattedMessage = ({ text, sender }) => {
   return (
     <div className="prose prose-sm max-w-none">
       {formatAssistantMessage(text)}
+      
+      {/* Render buttons if provided */}
+      {buttons && buttons.length > 0 && (
+        <div className="mt-4 flex flex-wrap gap-2">
+          {buttons.map((button, index) => (
+            <a
+              key={index}
+              href={button.url}
+              className="inline-flex items-center px-5 py-2.5 bg-sanctuary-sage hover:bg-sanctuary-sage-dark text-white text-sm font-quicksand font-medium rounded-full transition-sanctuary shadow-sanctuary hover:shadow-sanctuary-hover touch-target"
+            >
+              {button.icon && <span className="mr-2">{button.icon}</span>}
+              {button.label}
+              <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </a>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
@@ -305,16 +318,16 @@ export default function ChatWindow({ messages = [], onSend, isLoading = false, a
   };
 
   return (
-    <div className="flex flex-col h-full bg-gradient-to-br from-slate-50 to-blue-50 rounded-xl shadow-2xl border border-slate-200">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 rounded-t-xl">
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-            🧠
+    <div className="flex flex-col h-full bg-sanctuary-sand rounded-3xl shadow-sanctuary border border-sanctuary-misty/30">
+      {/* Header - Glassmorphism */}
+      <div className="glass-morphism text-sanctuary-slate p-5 rounded-t-3xl border-b border-sanctuary-misty/20">
+        <div className="flex items-center justify-center space-x-3">
+          <div className="w-12 h-12 rounded-3xl bg-sanctuary-sage/20 flex items-center justify-center transition-sanctuary hover:bg-sanctuary-sage/30">
+            <span className="text-2xl">🌿</span>
           </div>
-          <div>
-            <h3 className="font-semibold text-lg">Mental Health Companion</h3>
-            <p className="text-blue-100 text-sm">Your empathetic wellness guide</p>
+          <div className="text-center">
+            <h3 className="font-quicksand font-semibold text-xl text-sanctuary-slate">Mental Buddy</h3>
+            <p className="text-sanctuary-slate/70 text-sm leading-relaxed">Your Digital Sanctuary</p>
           </div>
         </div>
       </div>
@@ -323,23 +336,23 @@ export default function ChatWindow({ messages = [], onSend, isLoading = false, a
       <div 
         ref={messagesContainerRef}
         onScroll={handleScroll}
-        className="flex-1 overflow-y-auto p-6 space-y-6 min-h-0 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 hover:scrollbar-thumb-slate-400 relative" 
+        className="flex-1 overflow-y-auto p-6 space-y-6 min-h-0 sanctuary-scrollbar relative bg-sanctuary-sand" 
         style={{ maxHeight: 'calc(100vh - 250px)' }}
       >
         {messages.length === 0 ? (
-          <div className="text-center text-slate-600 mt-12">
-            <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-3xl text-white mx-auto mb-6 shadow-lg">
-              💬
+          <div className="text-center text-sanctuary-slate mt-12">
+            <div className="w-24 h-24 bg-sanctuary-sage/10 rounded-3xl flex items-center justify-center text-4xl mx-auto mb-6 neumorphic">
+              🌿
             </div>
-            <h3 className="text-xl font-semibold mb-2">Welcome to Your Mental Health Space</h3>
-            <p className="text-slate-500 max-w-md mx-auto leading-relaxed">
-              I'm here to provide a safe, supportive space for your mental wellness journey. 
-              Feel free to share what's on your mind.
+            <h3 className="text-2xl font-quicksand font-semibold mb-3 text-sanctuary-slate">Welcome to Your Digital Sanctuary</h3>
+            <p className="text-sanctuary-slate/70 max-w-md mx-auto leading-loose font-nunito">
+              This is your safe, private space for mental wellness. 
+              Share what's on your mind—I'm here to listen without judgment.
             </p>
-            <div className="mt-6 flex flex-wrap justify-center gap-2">
-              <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm">Confidential</span>
-              <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">Empathetic</span>
-              <span className="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm">Non-judgmental</span>
+            <div className="mt-8 flex flex-wrap justify-center gap-3">
+              <span className="bg-sanctuary-sage/20 text-sanctuary-slate px-4 py-2 rounded-3xl text-sm font-quicksand transition-sanctuary hover:bg-sanctuary-sage/30">🔒 Confidential</span>
+              <span className="bg-sanctuary-misty/30 text-sanctuary-slate px-4 py-2 rounded-3xl text-sm font-quicksand transition-sanctuary hover:bg-sanctuary-misty/50">💚 Empathetic</span>
+              <span className="bg-sanctuary-sage-light/20 text-sanctuary-slate px-4 py-2 rounded-3xl text-sm font-quicksand transition-sanctuary hover:bg-sanctuary-sage-light/30">🤝 Non-judgmental</span>
             </div>
           </div>
         ) : (
@@ -353,14 +366,14 @@ export default function ChatWindow({ messages = [], onSend, isLoading = false, a
               <Avatar sender={message.sender} />
               <div className={`flex flex-col ${message.sender === 'user' ? 'items-end' : 'items-start'}`}>
                 <div
-                  className={`max-w-lg px-5 py-4 rounded-2xl shadow-md ${
+                  className={`max-w-lg px-6 py-4 rounded-3xl shadow-sanctuary transition-sanctuary ${
                     message.sender === 'user'
-                      ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-br-sm'
-                      : 'bg-white text-slate-800 border border-slate-200 rounded-bl-sm'
+                      ? 'bg-[#52796F] text-white rounded-br-md shadow-lg'
+                      : 'neumorphic text-sanctuary-slate rounded-bl-md'
                   }`}
                 >
-                  <div className={`${message.sender === 'user' ? 'text-white' : 'text-slate-800'}`}>
-                    <FormattedMessage text={message.text} sender={message.sender} />
+                  <div className={`${message.sender === 'user' ? 'text-white' : 'text-sanctuary-slate'}`}>
+                    <FormattedMessage text={message.text} sender={message.sender} buttons={message.buttons} />
                   </div>
                   
                   {/* Read Aloud Button */}
@@ -392,13 +405,13 @@ export default function ChatWindow({ messages = [], onSend, isLoading = false, a
                     </button>
                   )}
                 </div>
-                <div className={`mt-1 px-2 ${
+                <div className={`mt-2 px-2 ${
                   message.sender === 'user' ? 'text-right' : 'text-left'
                 }`}>
-                  <span className="text-xs text-slate-500 font-medium">
-                    {message.sender === 'user' ? 'You' : 'Mental Health Companion'}
+                  <span className="text-xs text-sanctuary-slate/60 font-quicksand font-medium">
+                    {message.sender === 'user' ? 'You' : 'Your Companion •'}
                   </span>
-                  <span className="text-xs text-slate-400 ml-2">
+                  <span className="text-xs text-sanctuary-slate/40 ml-2 font-nunito">
                     {message.timestamp}
                   </span>
                 </div>
@@ -412,18 +425,18 @@ export default function ChatWindow({ messages = [], onSend, isLoading = false, a
           <div className="flex items-start space-x-3">
             <Avatar sender="assistant" />
             <div className="flex flex-col">
-              <div className="bg-white border border-slate-200 px-5 py-4 rounded-2xl rounded-bl-sm shadow-md">
+              <div className="neumorphic px-6 py-4 rounded-3xl rounded-bl-md">
                 <div className="flex items-center space-x-3">
                   <div className="flex space-x-1">
-                    <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce"></div>
-                    <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0.15s' }}></div>
-                    <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0.3s' }}></div>
+                    <div className="w-2.5 h-2.5 bg-sanctuary-sage rounded-full animate-bounce"></div>
+                    <div className="w-2.5 h-2.5 bg-sanctuary-sage rounded-full animate-bounce" style={{ animationDelay: '0.15s' }}></div>
+                    <div className="w-2.5 h-2.5 bg-sanctuary-sage rounded-full animate-bounce" style={{ animationDelay: '0.3s' }}></div>
                   </div>
-                  <span className="text-sm text-slate-600 font-medium">Thinking carefully about your message...</span>
+                  <span className="text-sm text-sanctuary-slate/70 font-nunito">Reflecting on your message...</span>
                 </div>
               </div>
-              <div className="mt-1 px-2">
-                <span className="text-xs text-slate-500 font-medium">Mental Health Companion</span>
+              <div className="mt-2 px-2">
+                <span className="text-xs text-sanctuary-slate/60 font-quicksand font-medium">Your Companion</span>
               </div>
             </div>
           </div>
@@ -435,7 +448,7 @@ export default function ChatWindow({ messages = [], onSend, isLoading = false, a
         {showScrollButton && (
           <button
             onClick={scrollToBottom}
-            className="absolute bottom-6 right-6 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white p-3 rounded-full shadow-lg transition-all duration-200 z-10 hover:scale-110"
+            className="absolute bottom-6 right-6 bg-sanctuary-sage hover:bg-sanctuary-sage-dark text-black p-3 rounded-3xl shadow-sanctuary hover:shadow-sanctuary-hover transition-sanctuary z-10 touch-target"
             title="Scroll to bottom"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -445,15 +458,15 @@ export default function ChatWindow({ messages = [], onSend, isLoading = false, a
         )}
       </div>
 
-      {/* Input Area - Fixed at bottom */}
-      <div className="border-t border-slate-200 p-6 flex-shrink-0 bg-white/70 backdrop-blur-sm rounded-b-xl">
+      {/* Input Area - Fixed at bottom with glassmorphism */}
+      <div className="border-t border-sanctuary-misty/20 p-6 flex-shrink-0 glass-morphism rounded-b-3xl">
         {/* Voice Input Status */}
         {isListening && (
-          <div className="mb-3 flex items-center justify-center space-x-2 text-sm text-blue-600 animate-pulse">
+          <div className="mb-3 flex items-center justify-center space-x-2 text-sm text-sanctuary-sage animate-pulse">
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 006 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z" clipRule="evenodd" />
             </svg>
-            <span className="font-medium">Listening... Speak now</span>
+            <span className="font-quicksand font-medium">Listening... Speak now</span>
           </div>
         )}
         
@@ -463,11 +476,11 @@ export default function ChatWindow({ messages = [], onSend, isLoading = false, a
             <button
               onClick={isListening ? stopListening : handleVoiceSend}
               disabled={isLoading}
-              className={`px-4 py-3 rounded-xl font-medium shadow-md transition-all duration-200 flex items-center space-x-2 ${
+              className={`px-4 py-3 rounded-3xl font-quicksand font-medium shadow-lg transition-sanctuary flex items-center space-x-2 touch-target ${
                 isListening
-                  ? 'bg-red-500 hover:bg-red-600 text-white animate-pulse'
-                  : 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white hover:shadow-lg hover:scale-105'
-              } disabled:from-slate-300 disabled:to-slate-400 disabled:cursor-not-allowed disabled:hover:scale-100`}
+                  ? 'bg-red-500 hover:bg-red-600 text-white pulse-gentle'
+                  : 'bg-[#52796F] hover:bg-[#3d5a52] text-white shadow-sanctuary-hover'
+              } disabled:bg-sanctuary-misty/50 disabled:cursor-not-allowed`}
               title={isListening ? 'Stop listening' : 'Voice input'}
             >
               {isListening ? (
@@ -488,39 +501,35 @@ export default function ChatWindow({ messages = [], onSend, isLoading = false, a
             </button>
           )}
           
-          <div className="flex-1 relative">
-            <input
-              type="text"
-              value={inputMessage}
-              onChange={(e) => setInputMessage(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder="Share what's on your mind..."
-              disabled={isListening}
-              className="w-full px-5 py-3 border border-slate-300 text-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white shadow-sm disabled:bg-slate-100 disabled:cursor-not-allowed"
-            />
-          </div>
+          <input
+            type="text"
+            value={inputMessage}
+            onChange={(e) => setInputMessage(e.target.value)}
+            onKeyPress={handleKeyPress}
+            placeholder="Share what's on your mind..."
+            disabled={isListening}
+            className="flex-1 px-6 py-3 border border-sanctuary-misty/40 text-sanctuary-slate rounded-full focus:outline-none focus-sanctuary transition-sanctuary bg-white/90 shadow-sanctuary disabled:bg-sanctuary-misty/20 disabled:cursor-not-allowed font-nunito leading-relaxed placeholder:text-sanctuary-slate/40"
+          />
           <button
             onClick={handleSend}
             disabled={!inputMessage.trim() || isLoading || isListening}
-            className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl hover:from-blue-600 hover:to-purple-700 disabled:from-slate-300 disabled:to-slate-400 disabled:cursor-not-allowed transition-all duration-200 font-medium shadow-md hover:shadow-lg hover:scale-105 disabled:hover:scale-100"
+            className={`w-14 h-14 flex items-center justify-center bg-[#52796F] text-white rounded-full hover:bg-[#3d5a52] disabled:bg-sanctuary-misty/50 disabled:cursor-not-allowed transition-sanctuary shadow-lg hover:shadow-xl touch-target flex-shrink-0 ${
+              inputMessage.trim() && !isLoading && !isListening ? 'pulse-gentle' : ''
+            }`}
+            title="Send message"
           >
             {isLoading ? (
-              <div className="flex items-center space-x-2">
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                <span>Sending</span>
-              </div>
+              <div className="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
             ) : (
-              <div className="flex items-center space-x-2">
-                <span>Send</span>
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                </svg>
-              </div>
+              <SendHorizonal className="w-6 h-6" />
             )}
           </button>
         </div>
-        <div className="mt-2 text-xs text-slate-500 text-center flex items-center justify-center space-x-2">
-          <span>Your conversations are private and confidential</span>
+        <div className="mt-3 text-xs text-sanctuary-slate/50 text-center flex items-center justify-center space-x-2 font-nunito">
+          <span className="flex items-center space-x-1">
+            <span>🔒</span>
+            <span>Your conversations are private and confidential</span>
+          </span>
           {voiceSupported && (
             <>
               <span>•</span>
