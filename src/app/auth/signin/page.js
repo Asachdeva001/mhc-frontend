@@ -4,8 +4,11 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '../../../lib/authContext';
+import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { auth } from '../../../lib/firebase';
 
 import { FiMail, FiLock, FiAlertCircle } from 'react-icons/fi';
+import { FcGoogle } from 'react-icons/fc';
 import { ImSpinner9 } from 'react-icons/im';
 
 export default function SignInPage() {

@@ -158,6 +158,13 @@ export const api = {
       });
     },
     
+    googleSignIn: async (tokenData) => {
+      return apiCall('/api/auth/google', {
+        method: 'POST',
+        body: JSON.stringify(tokenData),
+      });
+    },
+    
     getProfile: async () => {
       return apiCall('/api/auth/profile');
     },

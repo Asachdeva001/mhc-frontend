@@ -94,6 +94,30 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const signInWithGoogle = async (idToken) => {
+    try {
+      const response = await api.auth.googleSignIn({ idToken });
+      
+      if (response.sessionToken) {
+        setToken(response.sessionToken);
+        setUser(response.user);
+        
+        // Store in localStorage for persistence
+        localStorage.setItem('mental_buddy_token', response.sessionToken);
+        localStorage.setItem('user', JSON.stringify(response.user));
+        
+        console.log('✅ Google sign in successful');
+        
+        return { success: true, user: response.user };
+      }
+      
+      throw new Error('No token received from Google sign-in');
+    } catch (error) {
+      console.error('Google signin error:', error);
+      throw error;
+    }
+  };
+
   const refreshToken = async () => {
     try {
       const storedUser = localStorage.getItem('user');
@@ -158,6 +182,7 @@ export const AuthProvider = ({ children }) => {
     loading,
     signUp,
     signIn,
+    signInWithGoogle,
     signOut,
     refreshToken,
     getCurrentUser,

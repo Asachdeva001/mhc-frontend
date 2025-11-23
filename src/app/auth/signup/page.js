@@ -58,6 +58,28 @@ export default function SignUpPage() {
     if (step > 1) setStep(step - 1);
   };
 
+  const validatePasswordStrength = (password) => {
+    const errors = [];
+    
+    if (password.length < 8) {
+      errors.push("At least 8 characters");
+    }
+    if (!/[A-Z]/.test(password)) {
+      errors.push("One uppercase letter");
+    }
+    if (!/[a-z]/.test(password)) {
+      errors.push("One lowercase letter");
+    }
+    if (!/[0-9]/.test(password)) {
+      errors.push("One number");
+    }
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+      errors.push("One special character");
+    }
+    
+    return errors;
+  };
+
   const handleEmailSignUp = async (e) => {
     e.preventDefault();
     setError('');
@@ -66,8 +88,10 @@ export default function SignUpPage() {
       setError('Passwords do not match');
       return;
     }
-    if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters long');
+    
+    const passwordErrors = validatePasswordStrength(formData.password);
+    if (passwordErrors.length > 0) {
+      setError(`Password must contain: ${passwordErrors.join(', ')}`);
       return;
     }
 
@@ -160,8 +184,28 @@ export default function SignUpPage() {
                         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sanctuary-slate/60"><FiLock /></span>
                         <input id="password" name="password" type="password" value={formData.password} onChange={handleInputChange}
                           className="w-full text-sanctuary-slate pl-10 pr-3 py-3 rounded-3xl border border-sanctuary-misty/40 focus-sanctuary bg-white/90 placeholder:text-sanctuary-slate/40 font-nunito"
-                          placeholder="Password (min. 6 characters)" autoFocus />
+                          placeholder="Password (min. 8 characters)" autoFocus />
                       </div>
+                      {formData.password && (
+                        <div className="text-xs space-y-1 px-2 font-nunito">
+                          <p className="font-semibold text-sanctuary-slate/70 mb-1">Password must contain:</p>
+                          <p className={formData.password.length >= 8 ? 'text-green-600' : 'text-sanctuary-slate/60'}>
+                            ✓ At least 8 characters
+                          </p>
+                          <p className={/[A-Z]/.test(formData.password) ? 'text-green-600' : 'text-sanctuary-slate/60'}>
+                            ✓ One uppercase letter
+                          </p>
+                          <p className={/[a-z]/.test(formData.password) ? 'text-green-600' : 'text-sanctuary-slate/60'}>
+                            ✓ One lowercase letter
+                          </p>
+                          <p className={/[0-9]/.test(formData.password) ? 'text-green-600' : 'text-sanctuary-slate/60'}>
+                            ✓ One number
+                          </p>
+                          <p className={/[!@#$%^&*(),.?":{}|<>]/.test(formData.password) ? 'text-green-600' : 'text-sanctuary-slate/60'}>
+                            ✓ One special character
+                          </p>
+                        </div>
+                      )}
                       <div className="relative">
                         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sanctuary-slate/60"><FiLock /></span>
                         <input id="confirmPassword" name="confirmPassword" type="password" value={formData.confirmPassword} onChange={handleInputChange}
