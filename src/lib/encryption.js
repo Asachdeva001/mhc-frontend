@@ -182,6 +182,7 @@ class MessageEncryption {
    */
   async decryptMessages(messages, password) {
     const decryptedMessages = [];
+    let hasFailedDecryption = false;
     
     for (const message of messages) {
       // Check if message is properly encrypted
@@ -194,19 +195,19 @@ class MessageEncryption {
           };
           decryptedMessages.push(decryptedMessage);
         } catch (decryptError) {
-          console.warn('Failed to decrypt individual message, keeping original:', decryptError.message);
-          // If decryption fails, keep the message but mark it as potentially corrupted
-          decryptedMessages.push({
-            ...message,
-            text: typeof message.text === 'string' ? message.text : 'Encrypted message (decryption failed)',
-            encrypted: false,
-            decryptionFailed: true
-          });
+          console.warn('Failed to decrypt individual message:', decryptError.message);
+          hasFailedDecryption = true;
+          // Don't add failed messages to the array - they'll be cleared
         }
       } else {
         // Message is not encrypted or is plain text, return as-is
         decryptedMessages.push(message);
       }
+    }
+    
+    // If any decryption failed, throw error to trigger cleanup
+    if (hasFailedDecryption && decryptedMessages.length === 0) {
+      throw new Error('All messages failed to decrypt - encryption key mismatch');
     }
     
     return decryptedMessages;
@@ -221,6 +222,27 @@ class MessageEncryption {
     // Use user ID + device fingerprint for password generation
     const deviceInfo = navigator.userAgent + navigator.language + screen.width + screen.height;
     const combined = userId + deviceInfo;
+    
+    // Hash the combined string
+    const encoder = new TextEncoder();
+    const data = encoder.encode(combined);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = new Uint8Array(hashBuffer);
+    
+    // Convert to hex string
+    return Array.from(hashArray).map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  /**
+   * Generate a consistent password from ONLY user ID (no device info)
+   * This ensures the same password is generated across sign-ins
+   * @param {string} userId - User's unique ID
+   * @returns {Promise<string>} - Generated password
+   */
+  async generateConsistentPassword(userId) {
+    // Use ONLY user ID for consistent encryption across sessions
+    const staticSalt = 'mhc-buddy-encryption-v1'; // Static salt for consistency
+    const combined = userId + staticSalt;
     
     // Hash the combined string
     const encoder = new TextEncoder();

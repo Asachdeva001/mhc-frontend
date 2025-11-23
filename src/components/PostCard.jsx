@@ -19,7 +19,7 @@ const api = axios.create({
  * PostCard Component
  * Displays a single post with likes, replies, comments, and share functionality
  */
-export const PostCard = ({ post, onLike, onAddReply, user, setPopup }) => {
+export const PostCard = ({ post, onLike, onAddReply, onDeletePost, user, getToken, setPopup }) => {
     const [showReplyBox, setShowReplyBox] = useState(false);
     const [replyText, setReplyText] = useState("");
     const [localError, setLocalError] = useState("");
@@ -37,12 +37,13 @@ export const PostCard = ({ post, onLike, onAddReply, user, setPopup }) => {
     const handleDeletePost = async () => {
         if (!confirm('Are you sure you want to delete this post?')) return;
         try {
-            const token = localStorage.getItem('authToken');
+            const token = getToken();
             if (!token) throw new Error('No auth token');
             await api.delete(`/api/posts/${post.id}`, {
                 headers: { 'Authorization': `Bearer ${token}` },
             });
-            window.location.reload();
+            onDeletePost(post.id);
+            setPopup({ show: true, title: 'Success', message: 'Post deleted successfully.', type: 'success' });
         } catch (err) {
             console.error('Error deleting post:', err);
             setPopup({ show: true, title: 'Delete Failed', message: 'Could not delete post. Please try again.', type: 'error' });
@@ -177,6 +178,7 @@ export const PostCard = ({ post, onLike, onAddReply, user, setPopup }) => {
                                 postId={post.id}
                                 onAddReply={onAddReply}
                                 user={user}
+                                getToken={getToken}
                                 onDeleteComment={handleDeleteComment}
                                 onDeleteReply={handleDeleteReply}
                                 setPopup={setPopup}

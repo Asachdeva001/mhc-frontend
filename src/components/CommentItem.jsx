@@ -16,7 +16,7 @@ const api = axios.create({
  * CommentItem Component
  * Displays a single comment with nested replies and delete functionality
  */
-export const CommentItem = ({ comment, postId, onAddReply, user, onDeleteComment, onDeleteReply, setPopup }) => {
+export const CommentItem = ({ comment, postId, onAddReply, user, getToken, onDeleteComment, onDeleteReply, setPopup }) => {
     const [showSubReplyInput, setShowSubReplyInput] = useState(false);
     const [subReplyText, setSubReplyText] = useState("");
     const [localError, setLocalError] = useState("");
@@ -67,12 +67,13 @@ export const CommentItem = ({ comment, postId, onAddReply, user, onDeleteComment
     const handleDeleteComment = async () => {
         if (!confirm('Delete this comment?')) return;
         try {
-            const token = localStorage.getItem('authToken');
+            const token = getToken();
             if (!token) throw new Error('No auth token');
             await api.delete(`/api/posts/${postId}/comment/${comment.id}`, {
                 headers: { 'Authorization': `Bearer ${token}` },
             });
             onDeleteComment(comment.id);
+            setPopup({ show: true, title: 'Success', message: 'Comment deleted successfully.', type: 'success' });
         } catch (err) {
             console.error('Error deleting comment:', err);
             setPopup({ show: true, title: 'Delete Failed', message: 'Could not delete comment.', type: 'error' });
@@ -85,12 +86,13 @@ export const CommentItem = ({ comment, postId, onAddReply, user, onDeleteComment
         setDeletedReplies([...deletedReplies, replyId]);
 
         try {
-            const token = localStorage.getItem('authToken');
+            const token = getToken();
             if (!token) throw new Error('No auth token');
             await api.delete(`/api/posts/${postId}/comment/${comment.id}/reply/${replyId}`, {
                 headers: { 'Authorization': `Bearer ${token}` },
             });
             onDeleteReply(replyId);
+            setPopup({ show: true, title: 'Success', message: 'Reply deleted successfully.', type: 'success' });
         } catch (err) {
             console.error('Error deleting reply:', err);
             setDeletedReplies(deletedReplies.filter(id => id !== replyId));

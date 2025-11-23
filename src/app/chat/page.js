@@ -38,12 +38,12 @@ export default function ChatPage() {
   const initializeEncryption = async () => {
     try {
       setIsInitializingEncryption(true);
-      // Generate encryption password based on user ID and device info
-      const password = await messageEncryption.generateSecurePassword(user.uid);
+      // Generate consistent encryption password based ONLY on user ID (no device info)
+      const password = await messageEncryption.generateConsistentPassword(user.uid);
       setEncryptionPassword(password);
       
       // Store key hash for verification
-      const keyHash = await messageEncryption.generateSecurePassword(user.uid + '_hash');
+      const keyHash = await messageEncryption.generateConsistentPassword(user.uid + '_hash');
       encryptionKeyStorage.storeKeyHash(user.uid, keyHash);
       
       console.log('🔐 Encryption initialized for user:', user.uid);
@@ -77,15 +77,32 @@ export default function ChatPage() {
       if (password && savedMessages && savedMessages.length > 0) {
         try {
           decryptedMessages = await messageEncryption.decryptMessages(savedMessages, password);
-          console.log('✅ Successfully decrypted', decryptedMessages.length, 'localStorage messages');
+          if (decryptedMessages.length > 0) {
+            console.log('✅ Successfully decrypted', decryptedMessages.length, 'localStorage messages');
+          } else {
+            console.log('⚠️ No messages could be decrypted. Starting fresh...');
+            chatStorage.clearMessages(user.uid);
+            decryptedMessages = [];
+          }
         } catch (decryptError) {
-          console.warn('⚠️ Failed to decrypt localStorage messages, using plain text:', decryptError.message);
-          // Try to extract plain text if messages are malformed
-          decryptedMessages = savedMessages.map(msg => ({
-            ...msg,
-            text: typeof msg.text === 'string' ? msg.text : 'Message unavailable',
-            encrypted: false
-          }));
+          console.warn('⚠️ Failed to decrypt localStorage messages:', decryptError.message);
+          // Check if messages are actually encrypted - if yes, clear them and start fresh
+          const hasEncryptedMessages = savedMessages.some(msg => 
+            msg.encrypted && msg.text && typeof msg.text === 'object'
+          );
+          
+          if (hasEncryptedMessages) {
+            console.log('🔄 Found encrypted messages that cannot be decrypted. Clearing and starting fresh...');
+            chatStorage.clearMessages(user.uid);
+            decryptedMessages = [];
+          } else {
+            // Messages are plain text, use them as-is
+            decryptedMessages = savedMessages.map(msg => ({
+              ...msg,
+              text: typeof msg.text === 'string' ? msg.text : 'Message unavailable',
+              encrypted: false
+            }));
+          }
         }
       }
 
@@ -109,15 +126,30 @@ export default function ChatPage() {
           if (password && backendMessages && backendMessages.length > 0) {
             try {
               backendMessages = await messageEncryption.decryptMessages(backendMessages, password);
-              console.log('✅ Successfully decrypted', backendMessages.length, 'backend messages');
+              if (backendMessages.length > 0) {
+                console.log('✅ Successfully decrypted', backendMessages.length, 'backend messages');
+              } else {
+                console.log('⚠️ No backend messages could be decrypted. Starting fresh...');
+                backendMessages = [];
+              }
             } catch (decryptError) {
-              console.warn('⚠️ Failed to decrypt backend messages, using plain text:', decryptError.message);
-              // Try to extract plain text if messages are malformed
-              backendMessages = latestConversation.messages.map(msg => ({
-                ...msg,
-                text: typeof msg.text === 'string' ? msg.text : 'Message unavailable',
-                encrypted: false
-              }));
+              console.warn('⚠️ Failed to decrypt backend messages:', decryptError.message);
+              // Check if messages are actually encrypted
+              const hasEncryptedMessages = backendMessages.some(msg => 
+                msg.encrypted && msg.text && typeof msg.text === 'object'
+              );
+              
+              if (hasEncryptedMessages) {
+                console.log('🔄 Backend has encrypted messages that cannot be decrypted. Starting fresh...');
+                backendMessages = [];
+              } else {
+                // Messages are plain text, use them as-is
+                backendMessages = latestConversation.messages.map(msg => ({
+                  ...msg,
+                  text: typeof msg.text === 'string' ? msg.text : 'Message unavailable',
+                  encrypted: false
+                }));
+              }
             }
           }
 
@@ -530,35 +562,42 @@ export default function ChatPage() {
               <div className="space-y-2">
                 <button
                   onClick={async () => {
-                    const welcomeMessage = {
-                      text: "Hello! I'm Mental Health Buddy, your AI wellness companion. How are you feeling today?",
-                      sender: 'ai',
-                      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                    };
-                    setMessages([welcomeMessage]);
-                    
-                    // Create new session
-                    const newSessionId = `session_${Date.now()}`;
-                    setSessionId(newSessionId);
-                    
-                    // Save encrypted messages
-                    try {
-                      if (encryptionPassword) {
-                        const encryptedMessages = await messageEncryption.encryptMessages([welcomeMessage], encryptionPassword);
-                        chatStorage.saveMessages(user.uid, encryptedMessages);
-                        await api.chat.saveConversation(encryptedMessages, newSessionId);
-                      } else {
-                        chatStorage.saveMessages(user.uid, [welcomeMessage]);
-                        await api.chat.saveConversation([welcomeMessage], newSessionId);
+                    if (confirm('This will clear all chat messages and start fresh. Continue?')) {
+                      // Clear all data
+                      chatStorage.clearMessages(user.uid);
+                      encryptionKeyStorage.removeKeyHash(user.uid);
+                      
+                      const welcomeMessage = {
+                        text: "Hello! I'm Mental Health Buddy, your AI wellness companion. How are you feeling today?",
+                        sender: 'ai',
+                        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                      };
+                      setMessages([welcomeMessage]);
+                      
+                      // Create new session
+                      const newSessionId = `session_${Date.now()}`;
+                      setSessionId(newSessionId);
+                      
+                      // Save encrypted messages
+                      try {
+                        if (encryptionPassword) {
+                          const encryptedMessages = await messageEncryption.encryptMessages([welcomeMessage], encryptionPassword);
+                          chatStorage.saveMessages(user.uid, encryptedMessages);
+                          await api.chat.saveConversation(encryptedMessages, newSessionId);
+                        } else {
+                          chatStorage.saveMessages(user.uid, [welcomeMessage]);
+                          await api.chat.saveConversation([welcomeMessage], newSessionId);
+                        }
+                        console.log('✅ Chat cleared and reinitialized');
+                      } catch (error) {
+                        console.warn('Backend sync failed, data saved locally:', error.message);
                       }
-                    } catch (error) {
-                      console.warn('Backend sync failed, data saved locally:', error.message);
+                      setShowMobileSidebar(false);
                     }
-                    setShowMobileSidebar(false);
                   }}
                   className="w-full px-3 py-2 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition-colors text-xs sm:text-sm"
                 >
-                  🔄 Clear Chat
+                  🔄 Clear Chat & Fix Encryption
                 </button>
               </div>
             </div>

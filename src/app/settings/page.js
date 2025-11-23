@@ -164,27 +164,27 @@ const SettingsContent = ()=>{
         e.preventDefault();
         
         if (!passwordData.currentPassword) {
-            showToast('Please enter your current password', 'error');
+            showToast('⚠️ Please enter your current password', 'error');
             return;
         }
 
         if (!passwordData.newPassword) {
-            showToast('Please enter a new password', 'error');
+            showToast('⚠️ Please enter a new password', 'error');
             return;
         }
 
         if (passwordData.newPassword !== passwordData.confirmPassword) {
-            showToast('Passwords do not match', 'error');
+            showToast('⚠️ New passwords do not match', 'error');
             return;
         }
 
         if (passwordData.newPassword.length < 6) {
-            showToast('Password must be at least 6 characters long', 'error');
+            showToast('⚠️ New password must be at least 6 characters long', 'error');
             return;
         }
 
         if (passwordData.currentPassword === passwordData.newPassword) {
-            showToast('New password must be different from current password', 'error');
+            showToast('⚠️ New password must be different from current password', 'error');
             return;
         }
 
@@ -192,23 +192,32 @@ const SettingsContent = ()=>{
         
         try {
             // Verify current password and update to new one
-            await api.user.updatePassword({
+            const response = await api.user.updatePassword({
                 currentPassword: passwordData.currentPassword,
                 newPassword: passwordData.newPassword,
             });
             
-            showToast('Password updated successfully! Please sign in again.', 'success');
+            showToast('✅ Password updated successfully! Signing you out for security...', 'success');
             setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
             
-            // Sign out after 2 seconds
+            // Sign out after 3 seconds to let user see success message
             setTimeout(async () => {
                 await signOut();
-                router.push('/auth/signin');
-            }, 2000);
+                router.push('/auth/signin?message=password_changed');
+            }, 3000);
         } catch (error) {
             console.error('Error updating password:', error);
-            const errorMessage = error.message || 'Failed to update password';
-            showToast(errorMessage, 'error');
+            
+            // Handle specific error cases
+            if (error.response?.status === 401) {
+                showToast('❌ Current password is incorrect. Please try again.', 'error');
+            } else if (error.response?.data?.error) {
+                showToast(`❌ ${error.response.data.error}`, 'error');
+            } else if (error.message) {
+                showToast(`❌ ${error.message}`, 'error');
+            } else {
+                showToast('❌ Failed to update password. Please try again.', 'error');
+            }
         } finally {
             setIsSaving(false);
         }

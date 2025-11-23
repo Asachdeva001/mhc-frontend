@@ -293,10 +293,10 @@ export const api = {
       });
     },
     
-    updatePassword: async (newPassword) => {
+    updatePassword: async (passwordData) => {
       return apiCall('/api/user/password', {
         method: 'PUT',
-        body: JSON.stringify({ newPassword }),
+        body: JSON.stringify(passwordData),
       });
     },
     

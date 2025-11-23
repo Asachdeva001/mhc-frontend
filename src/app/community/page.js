@@ -195,13 +195,14 @@ export default function CommunityPage() {
             
             // Handle AI moderation errors specifically
             if (status === 400 && errorData?.error === 'Content not allowed') {
-                const flaggedText = errorData.flaggedContent ? `"${errorData.flaggedContent}"` : 'certain content';
-                const moderationMessage = `🚫 Post Not Allowed\n\nYour post contains ${flaggedText} that violates our community guidelines.\n\n${errorData.reason || 'Please revise your content and try again.'}`;
-                setInlineError(moderationMessage);
+                const moderationMessage = `Your post does not follow our community guidelines.\n\nPlease try writing something else that is respectful and supportive.`;
+                const detailedReason = errorData.reason ? `\n\nReason: ${errorData.reason}` : '';
+                
+                setInlineError(`⚠️ ${moderationMessage}`);
                 setPopup({ 
                     show: true, 
-                    title: '🚫 Content Moderation', 
-                    message: moderationMessage,
+                    title: '⚠️ Community Guidelines', 
+                    message: `${moderationMessage}${detailedReason}\n\nRemember: This is a safe space for mental health support. Let's keep it kind and supportive! 💚`,
                     type: 'error' 
                 });
             } else {
@@ -277,8 +278,14 @@ export default function CommunityPage() {
             
             // Handle AI moderation errors specifically for comments
             if (err.response?.status === 400 && errorData?.error === 'Content not allowed') {
-                const flaggedText = errorData.flaggedContent ? `"${errorData.flaggedContent}"` : 'certain content';
-                setLocalError && setLocalError(`⚠️ Your comment contains ${flaggedText} that violates our community guidelines. ${errorData.reason || 'Please revise and try again.'}`);
+                const message = 'Your comment does not follow our community guidelines. Please try writing something else that is respectful and supportive.';
+                setLocalError && setLocalError(`⚠️ ${message}`);
+                setPopup && setPopup({ 
+                    show: true, 
+                    title: '⚠️ Community Guidelines', 
+                    message: `${message}\n\nRemember: This is a safe space for mental health support. Let's keep it kind and supportive! 💚`,
+                    type: 'error' 
+                });
             } else {
                 const errorMessage = errorData?.message || errorData?.error || "Could not post reply. Try again.";
                 setLocalError && setLocalError(errorMessage);
@@ -401,7 +408,9 @@ export default function CommunityPage() {
                                         post={post}
                                         onLike={handleLike}
                                         onAddReply={handleAddReply}
+                                        onDeletePost={(postId) => setPosts(posts.filter(p => p.id !== postId))}
                                         user={user}
+                                        getToken={getToken}
                                         setPopup={setPopup}
                                     />
                                 ))}
