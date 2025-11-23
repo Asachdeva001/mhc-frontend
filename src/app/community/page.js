@@ -408,7 +408,7 @@ export default function CommunityPage() {
                                     </div>
                                 )}
                                 {!pageLoading && viewMode === 'feed' && posts.length === 0 && <div className="text-slate-500 py-6">No posts yet. Be the first to share 💬</div>}
-                                {!pageLoading && viewMode === 'myPosts' && posts.filter(p => p.userId === user?.uid).length === 0 && <div className="text-slate-500 py-6">You haven't posted yet. Share your thoughts! 💭</div>}
+                                {!pageLoading && viewMode === 'myPosts' && posts.filter(p => p.userId === user?.uid).length === 0 && <div className="text-slate-500 py-6">You haven&apos;t posted yet. Share your thoughts! 💭</div>}
                                 {filterPosts(
                                     (viewMode === 'feed' ? posts : posts.filter(p => p.userId === user?.uid)),
                                     searchQuery,
