@@ -140,30 +140,12 @@ export default function CommunityPage() {
         }
     }, [getToken, POSTS_PER_PAGE]);
 
-    // Initialize encryption
-    useEffect(() => {
-        const initEncryption = async () => {
-            if (!user) return;
-            
-            try {
-                await encryptionManager.initializeForUser(user.uid);
-                setEncryptionReady(true);
-                console.log('🔐 Community encryption ready');
-            } catch (error) {
-                console.error('❌ Failed to initialize community encryption:', error);
-                setEncryptionReady(true); // Continue without encryption
-            }
-        };
-
-        initEncryption();
-    }, [user]);
-
     // Fetch posts when auth is ready
     useEffect(() => {
-        if (!authLoading && encryptionReady) {
+        if (!authLoading) {
             fetchPosts(1);
         }
-    }, [authLoading, encryptionReady, fetchPosts]);
+    }, [authLoading, fetchPosts]);
 
     /**
      * Handle post submission
