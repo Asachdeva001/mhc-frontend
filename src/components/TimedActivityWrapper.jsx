@@ -148,8 +148,10 @@ export default function TimedActivityWrapper({
     const incompleteKey = `activity_incomplete_${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}_${activity.id}`;
     localStorage.removeItem(incompleteKey); // Clear incomplete marker - ensures activity shows as fresh/default
     
-    setTimeRemaining(newDuration);
-    setTotalTime(newDuration);
+    // Always use 5 minutes (300 seconds) as default on restart
+    const finalDuration = 300;
+    setTimeRemaining(finalDuration);
+    setTotalTime(finalDuration);
     setIsPaused(false);
     setShowRestartInput(false);
     setShowInitialInput(false); // Keep initial input closed to show fresh timer
