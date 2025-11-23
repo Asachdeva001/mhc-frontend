@@ -141,7 +141,7 @@ export default function MusicListening({
         {/* Hidden audio element with proper event handlers */}
         <audio
           ref={audioRef}
-          src="/audio/calm-loop.mp3"
+          src="/mario_bros.mp3"
           loop
           onCanPlay={handleAudioCanPlay}
           onEnded={() => setIsPlaying(false)}

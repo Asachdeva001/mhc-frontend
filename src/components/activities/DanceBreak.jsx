@@ -145,7 +145,7 @@ export default function DanceBreak({
 
         <audio
           ref={audioRef}
-          src="/audio/upbeat-dance.mp3"
+          src="/mario_bros.mp3"
           loop
           onCanPlay={handleAudioCanPlay}
           onEnded={() => setIsPlaying(false)}

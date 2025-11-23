@@ -130,20 +130,21 @@ const CalmMaze = () => {
   };
 
   return (
-    <div className="flex flex-col items-center gap-6">
+    <div className="flex flex-col items-center gap-4 sm:gap-6 w-full overflow-hidden px-2 sm:px-4">
       {/* Maze Grid */}
-      <div className="relative">
-        <div className="absolute top-2 left-2 text-white text-xs bg-black/50 px-3 py-1 rounded z-10">
+      <div className="relative w-full flex justify-center">
+        <div className="absolute top-2 left-2 text-white text-xs sm:text-sm bg-black/50 px-2 sm:px-3 py-1 rounded z-10">
           Use arrow keys or buttons to reach the goal
         </div>
-        <div className="grid grid-cols-10 gap-1 bg-gradient-to-br from-green-200 to-blue-200 p-4 rounded-lg shadow-lg">
+        {/* Responsive maze grid */}
+        <div className="grid gap-0.5 sm:gap-1 bg-gradient-to-br from-green-200 to-blue-200 p-2 sm:p-4 rounded-lg shadow-lg" style={{ gridTemplateColumns: 'repeat(10, minmax(0, 1fr))' }}>
           {maze.map((row, y) =>
             row.map((cell, x) => (
               <motion.div
                 key={`${x}-${y}`}
-                className={`w-8 h-8 rounded ${
+                className={`rounded w-4 h-4 sm:w-8 sm:h-8 ${
                   cell === 1 ? 'bg-slate-700' : 'bg-white/50'
-                } ${x === playerPos.x && y === playerPos.y ? 'bg-red-500 rounded-full shadow-lg' : ''} ${x === 8 && y === 8 ? 'bg-yellow-400 rounded-full animate-pulse' : ''}`}
+                } ${x === playerPos.x && y === playerPos.y ? 'bg-gray-400 rounded-full shadow-lg' : ''} ${x === 8 && y === 8 ? 'bg-yellow-400 rounded-full animate-pulse' : ''}`}
                 animate={x === playerPos.x && y === playerPos.y ? { scale: [1, 1.2, 1] } : {}}
                 transition={{ duration: 0.3 }}
               />
@@ -154,7 +155,7 @@ const CalmMaze = () => {
           <motion.div
             initial={{ opacity: 0, scale: 0.5 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="absolute inset-0 flex items-center justify-center bg-green-500/80 rounded-lg text-white font-bold text-xl"
+            className="absolute inset-0 flex items-center justify-center bg-green-500/80 rounded-lg text-white font-bold text-lg sm:text-xl"
           >
             🎉 Maze Completed!
           </motion.div>
@@ -162,54 +163,54 @@ const CalmMaze = () => {
       </div>
 
       {/* Instructions */}
-      <p className="text-slate-600 text-center text-sm">
+      <p className="text-slate-600 text-center text-xs sm:text-sm max-w-full">
         Navigate with arrow keys or use the buttons below to reach the glowing goal<br />
         <span className="text-xs text-slate-500">Relax and take your time</span>
       </p>
 
-      {/* Mobile Control Buttons - D-Pad Style */}
-      <div className="flex flex-col items-center gap-4 w-full">
+      {/* Mobile Control Buttons - D-Pad Style (Mobile Only) */}
+      <div className="sm:hidden flex flex-col items-center gap-2 w-full justify-center">
         {/* Up Button */}
         <motion.button
           onClick={() => movePlayer('up')}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
-          className="flex items-center justify-center w-14 h-14 rounded-full bg-gradient-to-br from-teal-400 to-teal-600 text-white shadow-lg hover:shadow-xl transition-shadow"
+          className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-teal-400 to-teal-600 text-white shadow-lg hover:shadow-xl transition-shadow flex-shrink-0"
           aria-label="Move Up"
         >
-          <ChevronUp size={28} strokeWidth={3} />
+          <ChevronUp size={20} strokeWidth={3} />
         </motion.button>
 
         {/* Left, Down, Right Buttons in Row */}
-        <div className="flex gap-4">
+        <div className="flex gap-2 items-center justify-center">
           <motion.button
             onClick={() => movePlayer('left')}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
-            className="flex items-center justify-center w-14 h-14 rounded-full bg-gradient-to-br from-teal-400 to-teal-600 text-white shadow-lg hover:shadow-xl transition-shadow"
+            className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-teal-400 to-teal-600 text-white shadow-lg hover:shadow-xl transition-shadow flex-shrink-0"
             aria-label="Move Left"
           >
-            <ChevronLeft size={28} strokeWidth={3} />
+            <ChevronLeft size={20} strokeWidth={3} />
           </motion.button>
 
           <motion.button
             onClick={() => movePlayer('down')}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
-            className="flex items-center justify-center w-14 h-14 rounded-full bg-gradient-to-br from-teal-400 to-teal-600 text-white shadow-lg hover:shadow-xl transition-shadow"
+            className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-teal-400 to-teal-600 text-white shadow-lg hover:shadow-xl transition-shadow flex-shrink-0"
             aria-label="Move Down"
           >
-            <ChevronDown size={28} strokeWidth={3} />
+            <ChevronDown size={20} strokeWidth={3} />
           </motion.button>
 
           <motion.button
             onClick={() => movePlayer('right')}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
-            className="flex items-center justify-center w-14 h-14 rounded-full bg-gradient-to-br from-teal-400 to-teal-600 text-white shadow-lg hover:shadow-xl transition-shadow"
+            className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-teal-400 to-teal-600 text-white shadow-lg hover:shadow-xl transition-shadow flex-shrink-0"
             aria-label="Move Right"
           >
-            <ChevronRight size={28} strokeWidth={3} />
+            <ChevronRight size={20} strokeWidth={3} />
           </motion.button>
         </div>
       </div>
@@ -219,7 +220,7 @@ const CalmMaze = () => {
         onClick={handleNewLevel}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
-        className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold rounded-full hover:from-blue-600 hover:to-blue-700 shadow-lg hover:shadow-xl transition-all"
+        className="px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold text-sm sm:text-base rounded-full hover:from-blue-600 hover:to-blue-700 shadow-lg hover:shadow-xl transition-all flex-shrink-0"
       >
         New Level
       </motion.button>
