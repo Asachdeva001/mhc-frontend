@@ -346,7 +346,7 @@ const DailyCheckin = ({ todayMood, onMoodLogged }) => {
         layout
         className={`${COLORS.cardBg} rounded-3xl shadow-xl ${COLORS.cardBorder} border p-6 text-center`}
       >
-        <p className={`text-xl font-bold ${COLORS.primary}`}>You've completed your daily check-in!</p>
+        <p className={`text-xl font-bold ${COLORS.primary}`}>You&apos;ve completed your daily check-in!</p>
 
         <p className="text-5xl my-4 animate-bounce-once">
           {getMoodEmoji(todayMood.moodEntry.mood)}

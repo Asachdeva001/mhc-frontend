@@ -68,13 +68,13 @@ export default function AboutPage() {
               Our Mission: A Digital Sanctuary
             </h2>
             <p className="text-lg text-sanctuary-slate/70 max-w-4xl mx-auto text-center mb-4 font-quicksand leading-relaxed">
-              Mental Buddy is more than an app—it's a <span className="font-semibold text-sanctuary-sage">Digital Sanctuary</span> where 
-              your mental wellness comes first. We've created a space where privacy isn't an afterthought, 
-              it's the foundation. Where AI doesn't replace human connection, but bridges the gap when you 
+              Mental Buddy is more than an app—it&apos;s a <span className="font-semibold text-sanctuary-sage">Digital Sanctuary</span> where 
+              your mental wellness comes first. We&apos;ve created a space where privacy isn&apos;t an afterthought, 
+              it&apos;s the foundation. Where AI doesn&apos;t replace human connection, but bridges the gap when you 
               need support most.
             </p>
             <p className="text-lg text-sanctuary-slate/70 max-w-4xl mx-auto text-center font-quicksand leading-relaxed">
-              In a world that's always rushing, we offer you a moment to pause, reflect, and heal—on your terms, 
+              In a world that&apos;s always rushing, we offer you a moment to pause, reflect, and heal—on your terms, 
               at your pace, with complete confidentiality.
             </p>
           </div>
@@ -158,7 +158,7 @@ export default function AboutPage() {
               >
                 <Lock size={28} className="text-sanctuary-sage flex-shrink-0 mt-1" />
                 <div>
-                  <h3 className="font-bold text-sanctuary-slate mb-2 text-lg font-nunito">We Don't Sell Your Data. Ever.</h3>
+                  <h3 className="font-bold text-sanctuary-slate mb-2 text-lg font-nunito">We Don&apos;t Sell Your Data. Ever.</h3>
                   <p className="text-sanctuary-slate/70 font-quicksand leading-relaxed">
                     Your personal information, mental health data, and conversations will never be sold, 
                     shared, or monetized. Your trust is not for sale.
@@ -201,7 +201,7 @@ export default function AboutPage() {
               </div>
             </motion.div>
             <h2 className="text-4xl md:text-5xl font-bold text-sanctuary-slate mb-10 text-center font-nunito">
-              Need Help? We're Here.
+              Need Help? We&apos;re Here.
             </h2>
             
             <div className="max-w-4xl mx-auto space-y-6">
@@ -239,7 +239,7 @@ export default function AboutPage() {
                   </div>
                   <div>
                     <h3 className="text-xl font-semibold text-sanctuary-slate font-nunito">Crisis Support</h3>
-                    <p className="text-sm text-sanctuary-slate/60 font-quicksand">If you're in crisis, please reach out immediately</p>
+                    <p className="text-sm text-sanctuary-slate/60 font-quicksand">If you&apos;re in crisis, please reach out immediately</p>
                   </div>
                 </div>
                 <div className="space-y-3 ml-16">
@@ -274,7 +274,7 @@ export default function AboutPage() {
               <div className="text-center pt-4">
                 <p className="text-sm text-sanctuary-slate/60 font-quicksand leading-relaxed">
                   <strong className="text-sanctuary-slate">Important:</strong> Mental Buddy is a wellness support tool, 
-                  not a replacement for professional mental health care. If you're experiencing a mental health emergency, 
+                  not a replacement for professional mental health care. If you&apos;re experiencing a mental health emergency, 
                   please contact emergency services or a licensed mental health professional immediately.
                 </p>
               </div>
