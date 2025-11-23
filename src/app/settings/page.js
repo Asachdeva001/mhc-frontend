@@ -16,7 +16,7 @@ const tabs = [
   { id: 'data', label: 'Data Management', icon: Database },
 ];
 
-function SettingsContent() {
+const SettingsContent = ()=>{
   const searchParams = useSearchParams();
   const router = useRouter();
   const { user, isAuthenticated, loading, signOut } = useAuth();
@@ -583,7 +583,7 @@ function SettingsContent() {
 
 export default function SettingsPage() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
       <SettingsContent />
     </Suspense>
   );
