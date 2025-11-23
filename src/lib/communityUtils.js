@@ -29,6 +29,10 @@ export const containsSensitiveWord = (text) => {
  * Renders content with styled hashtags (teal color)
  */
 export const renderContentWithTags = (text) => {
+    if (!text || typeof text !== 'string') {
+        return <span>{String(text || '')}</span>;
+    }
+    
     const parts = text.split(/(#[\w-]+)/g);
     return parts.map((part, idx) => {
         if (part?.startsWith('#')) {
@@ -46,6 +50,7 @@ export const renderContentWithTags = (text) => {
  * Extracts hashtags from content text
  */
 export const extractHashtags = (content) => {
+    if (!content || typeof content !== 'string') return [];
     const matches = content.match(/#[\w-]+/g) || [];
     return matches.map(tag => tag.toLowerCase());
 };
@@ -56,7 +61,9 @@ export const extractHashtags = (content) => {
 export const filterPosts = (allPosts, query, filters) => {
     return allPosts.filter(post => {
         const queryLower = query.toLowerCase();
-        const contentMatch = post.content.toLowerCase().includes(queryLower);
+        // Handle encrypted or non-string content
+        const contentStr = typeof post.content === 'string' ? post.content : '';
+        const contentMatch = contentStr.toLowerCase().includes(queryLower);
         const tagsInContent = extractHashtags(post.content);
         const tagMatch = filters.tags.length === 0 || filters.tags.some(tag => tagsInContent.includes(tag.toLowerCase()));
         const topicMatch = filters.topics.length === 0 || filters.topics.includes(post.tag);

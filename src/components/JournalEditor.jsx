@@ -9,9 +9,12 @@ import {
   Sparkles
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/lib/authContext';
+import { encryptionManager } from '@/lib/encryptionManager';
 
 export default function JournalEditor({ entryId = null, initialData = null, onClose, clickPosition = { x: window.innerWidth / 2, y: window.innerHeight / 2 } }) {
   const router = useRouter();
+  const { user } = useAuth();
   
   // Editor state
   const [title, setTitle] = useState(initialData?.title || '');
@@ -56,6 +59,11 @@ export default function JournalEditor({ entryId = null, initialData = null, onCl
       return;
     }
 
+    if (!user) {
+      setError('You must be logged in to save entries.');
+      return;
+    }
+
     setSaving(true);
     setError(null);
 
@@ -68,19 +76,31 @@ export default function JournalEditor({ entryId = null, initialData = null, onCl
       
       const method = entryId ? 'PUT' : 'POST';
 
+      // Encrypt the entry before sending
+      let entryData = {
+        title: title.trim(),
+        content: content.trim(),
+        moodScore,
+        tags,
+        isFavorite,
+      };
+
+      try {
+        const encryptedEntry = await encryptionManager.encryptJournalEntry(entryData, user.uid);
+        entryData = encryptedEntry;
+        console.log('🔐 Journal entry encrypted before save');
+      } catch (encryptError) {
+        console.warn('⚠️ Failed to encrypt entry, saving unencrypted:', encryptError);
+        // Continue with unencrypted data if encryption fails
+      }
+
       const response = await fetch(url, {
         method,
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          title: title.trim(),
-          content: content.trim(),
-          moodScore,
-          tags,
-          isFavorite,
-        }),
+        body: JSON.stringify(entryData),
       });
 
       if (!response.ok) {
