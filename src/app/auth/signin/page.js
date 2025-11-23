@@ -121,7 +121,7 @@ export default function SignInPage() {
           {/* Sign Up link */}
           <div className="mt-6 text-center">
             <p className="text-sm text-sanctuary-slate/80 font-nunito">
-              Don't have an account?{' '}
+              Don&apos;t have an account?{' '}
               <Link href="/auth/signup" className="font-semibold text-[#52796F] hover:text-sanctuary-sage transition-sanctuary">
                 Sign Up
               </Link>

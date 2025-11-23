@@ -284,7 +284,7 @@ const ActivityProgress = ({ completed, total }) => {
                 <div className={`w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg`}>
                     <span className="text-2xl text-white">📊</span>
                 </div>
-                <h2 className={`text-2xl font-bold ${COLORS.textDark}`}>Today's Progress</h2>
+                <h2 className={`text-2xl font-bold ${COLORS.textDark}`}>Today&apos;s Progress</h2>
             </div>
             
             {/* Circular Progress */}

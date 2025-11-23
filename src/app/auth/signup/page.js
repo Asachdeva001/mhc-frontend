@@ -166,7 +166,7 @@ export default function SignUpPage() {
 
                 {step === 2 && (
                   <motion.div key="step2" variants={stepVariants} initial="hidden" animate="visible" exit="exit">
-                    <h2 className="text-lg font-semibold text-sanctuary-slate mb-4 font-quicksand">What's your email?</h2>
+                    <h2 className="text-lg font-semibold text-sanctuary-slate mb-4 font-quicksand">What&apos; your email?</h2>
                     <div className="relative">
                       <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sanctuary-slate/60"><FiMail /></span>
                       <input id="email" name="email" type="email" value={formData.email} onChange={handleInputChange} 
