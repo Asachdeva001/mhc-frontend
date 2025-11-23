@@ -102,25 +102,34 @@ export default function LandingPage() {
         animate={{
           backgroundColor: scrolled ? 'rgba(255, 255, 255, 0.8)' : 'rgba(255, 255, 255, 0)',
           backdropFilter: scrolled ? 'blur(12px)' : 'blur(0px)',
-          boxShadow: scrolled ? '0 4px_6px -1px rgba(0, 0, 0, 0.05)' : 'none',
+          boxShadow: scrolled ? '0 4px 6px -1px rgba(0, 0, 0, 0.05)' : 'none',
         }}
       >
-        <div className="container mx-auto px-6 py-4 flex justify-between items-center">
+        <div className="container mx-auto px-4 md:px-6 py-4 flex flex-wrap justify-between items-center gap-4">
           <Link href="/" className="text-2xl font-bold text-sanctuary-slate font-quicksand">
             Mental<span className="text-sanctuary-sage">Buddy</span>
           </Link>
-          <nav className="flex items-center space-x-2 md:space-x-4">
-            <Link href="/auth/signin" className="px-4 py-2 text-sanctuary-slate/80 hover:text-sanctuary-sage transition-sanctuary rounded-full hover:bg-sanctuary-misty/20 font-nunito">
+      
+          <nav className="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-4 w-full md:w-auto">
+            <Link
+              href="/auth/signin"
+              className="px-4 py-2 text-sanctuary-slate/80 hover:text-sanctuary-sage transition-sanctuary rounded-full hover:bg-sanctuary-misty/20 font-nunito"
+            >
               Sign In
             </Link>
+      
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Link href="/auth/signup" className="bg-[#52796F] text-white font-semibold px-5 py-2 rounded-full hover:bg-[#3d5a52] transition-sanctuary shadow-sanctuary hover:shadow-sanctuary-hover font-quicksand">
+              <Link
+                href="/auth/signup"
+                className="bg-[#52796F] text-white font-semibold px-5 py-2 rounded-full hover:bg-[#3d5a52] transition-sanctuary shadow-sanctuary hover:shadow-sanctuary-hover font-quicksand"
+              >
                 Sign Up
               </Link>
             </motion.div>
           </nav>
         </div>
       </motion.header>
+
 
       <main className="pt-28 md:pt-32 relative z-10">
         {/* Hero Section */}
