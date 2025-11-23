@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Check, Clock } from 'lucide-react';
+import { Check } from 'lucide-react';
 
 const EMOJI_MAP = {
   Mindfulness: '🧘',
@@ -63,15 +63,11 @@ export default function ActivityCard({ activity, onStart }) {
           <span className="text-4xl sm:text-5xl">{EMOJI_MAP[activity.category] || EMOJI_MAP.default}</span>
         </motion.div>
 
-        {/* Title and duration */}
+        {/* Title */}
         <div className="flex-grow flex flex-col items-center justify-center text-center mb-4">
-          <h3 className="text-lg sm:text-xl font-bold text-sanctuary-slate leading-tight font-nunito mb-3 px-2">
+          <h3 className="text-lg sm:text-xl font-bold text-sanctuary-slate leading-tight font-nunito px-2">
             {activity.title}
           </h3>
-          <div className="flex items-center justify-center gap-2 px-4 py-2 bg-white/60 backdrop-blur-sm rounded-full border border-white/80 shadow-sm">
-            <Clock size={16} className="text-sanctuary-sage" />
-            <span className="text-sm font-semibold text-sanctuary-slate font-quicksand">{activity.duration}</span>
-          </div>
         </div>
 
         {/* Action button */}
