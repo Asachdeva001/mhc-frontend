@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { ChevronUp, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const isSolvable = (maze) => {
   const visited = Array(10).fill().map(() => Array(10).fill(false));
@@ -91,23 +92,32 @@ const CalmMaze = () => {
     oscillator.stop(audioContext.currentTime + 0.6);
   };
 
+  // Handle movement (keyboard and button clicks)
+  const movePlayer = (direction) => {
+    const { x, y } = playerPos;
+    let newX = x, newY = y;
+
+    if (direction === 'up') newY = y - 1;
+    if (direction === 'down') newY = y + 1;
+    if (direction === 'left') newX = x - 1;
+    if (direction === 'right') newX = x + 1;
+
+    if (maze[newY] && maze[newY][newX] === 0) {
+      setPlayerPos({ x: newX, y: newY });
+      playMoveSound();
+      if (newX === 8 && newY === 8) {
+        setCompleted(true);
+        playCompleteSound();
+      }
+    }
+  };
+
   useEffect(() => {
     const handleKey = (e) => {
-      const { x, y } = playerPos;
-      let newX = x, newY = y;
-      if (e.key === 'ArrowUp') newY = y - 1;
-      if (e.key === 'ArrowDown') newY = y + 1;
-      if (e.key === 'ArrowLeft') newX = x - 1;
-      if (e.key === 'ArrowRight') newX = x + 1;
-
-      if (maze[newY] && maze[newY][newX] === 0) {
-        setPlayerPos({ x: newX, y: newY });
-        playMoveSound();
-        if (newX === 8 && newY === 8) { // Goal position
-          setCompleted(true);
-          playCompleteSound();
-        }
-      }
+      if (e.key === 'ArrowUp') movePlayer('up');
+      if (e.key === 'ArrowDown') movePlayer('down');
+      if (e.key === 'ArrowLeft') movePlayer('left');
+      if (e.key === 'ArrowRight') movePlayer('right');
     };
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
@@ -120,12 +130,13 @@ const CalmMaze = () => {
   };
 
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center gap-6">
+      {/* Maze Grid */}
       <div className="relative">
-        <div className="absolute top-2 left-2 text-white text-xs bg-black/50 px-1 py-0.5 rounded">
-          Use arrow keys to reach the goal
+        <div className="absolute top-2 left-2 text-white text-xs bg-black/50 px-3 py-1 rounded z-10">
+          Use arrow keys or buttons to reach the goal
         </div>
-        <div className="grid grid-cols-10 gap-1 bg-gradient-to-br from-green-200 to-blue-200 p-4 rounded shadow-lg">
+        <div className="grid grid-cols-10 gap-1 bg-gradient-to-br from-green-200 to-blue-200 p-4 rounded-lg shadow-lg">
           {maze.map((row, y) =>
             row.map((cell, x) => (
               <motion.div
@@ -143,22 +154,75 @@ const CalmMaze = () => {
           <motion.div
             initial={{ opacity: 0, scale: 0.5 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="absolute inset-0 flex items-center justify-center bg-green-500/80 rounded text-white font-bold"
+            className="absolute inset-0 flex items-center justify-center bg-green-500/80 rounded-lg text-white font-bold text-xl"
           >
             🎉 Maze Completed!
           </motion.div>
         )}
       </div>
-      <p className="mt-4 text-slate-600 text-center">
-        Navigate with arrow keys to the glowing goal<br />
-        Relax and take your time
+
+      {/* Instructions */}
+      <p className="text-slate-600 text-center text-sm">
+        Navigate with arrow keys or use the buttons below to reach the glowing goal<br />
+        <span className="text-xs text-slate-500">Relax and take your time</span>
       </p>
-      <button
+
+      {/* Mobile Control Buttons - D-Pad Style */}
+      <div className="flex flex-col items-center gap-4 w-full">
+        {/* Up Button */}
+        <motion.button
+          onClick={() => movePlayer('up')}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
+          className="flex items-center justify-center w-14 h-14 rounded-full bg-gradient-to-br from-teal-400 to-teal-600 text-white shadow-lg hover:shadow-xl transition-shadow"
+          aria-label="Move Up"
+        >
+          <ChevronUp size={28} strokeWidth={3} />
+        </motion.button>
+
+        {/* Left, Down, Right Buttons in Row */}
+        <div className="flex gap-4">
+          <motion.button
+            onClick={() => movePlayer('left')}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            className="flex items-center justify-center w-14 h-14 rounded-full bg-gradient-to-br from-teal-400 to-teal-600 text-white shadow-lg hover:shadow-xl transition-shadow"
+            aria-label="Move Left"
+          >
+            <ChevronLeft size={28} strokeWidth={3} />
+          </motion.button>
+
+          <motion.button
+            onClick={() => movePlayer('down')}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            className="flex items-center justify-center w-14 h-14 rounded-full bg-gradient-to-br from-teal-400 to-teal-600 text-white shadow-lg hover:shadow-xl transition-shadow"
+            aria-label="Move Down"
+          >
+            <ChevronDown size={28} strokeWidth={3} />
+          </motion.button>
+
+          <motion.button
+            onClick={() => movePlayer('right')}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            className="flex items-center justify-center w-14 h-14 rounded-full bg-gradient-to-br from-teal-400 to-teal-600 text-white shadow-lg hover:shadow-xl transition-shadow"
+            aria-label="Move Right"
+          >
+            <ChevronRight size={28} strokeWidth={3} />
+          </motion.button>
+        </div>
+      </div>
+
+      {/* New Level Button */}
+      <motion.button
         onClick={handleNewLevel}
-        className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold rounded-full hover:from-blue-600 hover:to-blue-700 shadow-lg hover:shadow-xl transition-all"
       >
         New Level
-      </button>
+      </motion.button>
     </div>
   );
 };
