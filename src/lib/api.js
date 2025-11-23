@@ -101,7 +101,7 @@ const apiCall = async (endpoint, options = {}, isRetry = false) => {
 // API functions
 export const api = {
   // Generate AI response
-  generateResponse: async (message, messages = [], imageUrl = null, userId = null) => {
+  generateResponse: async (message, messages = [], imageUrl = null, userId = null, facialEmotion = null, multiModalData = null) => {
     return apiCall('/api/generate', {
       method: 'POST',
       body: JSON.stringify({
@@ -109,6 +109,8 @@ export const api = {
         messages,
         imageUrl,
         userId,
+        facialEmotion,
+        multiModalData,
       }),
     });
   },

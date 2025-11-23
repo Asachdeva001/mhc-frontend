@@ -109,17 +109,17 @@ export default function CommunityPage() {
                 },
             });
 
-            const newPosts = response.data || [];
-            console.log(`Fetched ${newPosts.length} posts for page ${pageNum}`);
+            const fetchedPosts = response.data || [];
+            console.log(`Fetched ${fetchedPosts.length} posts for page ${pageNum}`);
             
-            setPosts(newPosts);
+            setPosts(fetchedPosts);
             setCurrentPage(pageNum);
             
             // Calculate total pages based on results returned
-            const hasMore = newPosts.length === POSTS_PER_PAGE;
+            const hasMore = fetchedPosts.length === POSTS_PER_PAGE;
             const estimatedTotal = hasMore ? Math.ceil((offset + POSTS_PER_PAGE + 1) / POSTS_PER_PAGE) : pageNum;
             setTotalPages(Math.max(pageNum, estimatedTotal));
-            setTotalPosts(offset + newPosts.length);
+            setTotalPosts(offset + fetchedPosts.length);
 
             setApiDebug((d) => ({ ...d, lastUrl: response.config?.url || '/api/posts', lastStatus: response.status, lastError: null }));
             setInlineError("");
@@ -140,12 +140,30 @@ export default function CommunityPage() {
         }
     }, [getToken, POSTS_PER_PAGE]);
 
+    // Initialize encryption
+    useEffect(() => {
+        const initEncryption = async () => {
+            if (!user) return;
+            
+            try {
+                await encryptionManager.initializeForUser(user.uid);
+                setEncryptionReady(true);
+                console.log('🔐 Community encryption ready');
+            } catch (error) {
+                console.error('❌ Failed to initialize community encryption:', error);
+                setEncryptionReady(true); // Continue without encryption
+            }
+        };
+
+        initEncryption();
+    }, [user]);
+
     // Fetch posts when auth is ready
     useEffect(() => {
-        if (!authLoading) {
+        if (!authLoading && encryptionReady) {
             fetchPosts(1);
         }
-    }, [authLoading, fetchPosts]);
+    }, [authLoading, encryptionReady, fetchPosts]);
 
     /**
      * Handle post submission
@@ -190,11 +208,26 @@ export default function CommunityPage() {
             console.error("Post creation error:", error);
             const status = error.response?.status;
             const url = error.config?.url || '/api/posts';
-            setApiDebug((d) => ({ ...d, lastUrl: url, lastStatus: status || null, lastError: error.response?.data || error.message }));
-            const errorMessage = status === 404
-                ? `Post endpoint not found (404). Check NEXT_PUBLIC_API_URL and that your backend is running.`
-                : (error.response?.data?.error || "Could not create post. Try again.");
-            setInlineError(errorMessage);
+            const errorData = error.response?.data;
+            setApiDebug((d) => ({ ...d, lastUrl: url, lastStatus: status || null, lastError: errorData || error.message }));
+            
+            // Handle AI moderation errors specifically
+            if (status === 400 && errorData?.error === 'Content not allowed') {
+                const flaggedText = errorData.flaggedContent ? `"${errorData.flaggedContent}"` : 'certain content';
+                const moderationMessage = `🚫 Post Not Allowed\n\nYour post contains ${flaggedText} that violates our community guidelines.\n\n${errorData.reason || 'Please revise your content and try again.'}`;
+                setInlineError(moderationMessage);
+                setPopup({ 
+                    show: true, 
+                    title: '🚫 Content Moderation', 
+                    message: moderationMessage,
+                    type: 'error' 
+                });
+            } else {
+                const errorMessage = status === 404
+                    ? `Post endpoint not found (404). Check NEXT_PUBLIC_API_URL and that your backend is running.`
+                    : (errorData?.message || errorData?.error || "Could not create post. Try again.");
+                setInlineError(errorMessage);
+            }
         }
     };
 
@@ -257,9 +290,17 @@ export default function CommunityPage() {
             setLocalError && setLocalError("");
         } catch (err) {
             console.error('Comment/Reply error:', err);
-            setApiDebug((d) => ({ ...d, lastUrl: err.config?.url || `/api/posts/${postId}/comment`, lastStatus: err.response?.status || null, lastError: err.response?.data || err.message }));
-            const errorMessage = err.response?.data?.error || "Could not post reply. Try again.";
-            setLocalError && setLocalError(errorMessage);
+            const errorData = err.response?.data;
+            setApiDebug((d) => ({ ...d, lastUrl: err.config?.url || `/api/posts/${postId}/comment`, lastStatus: err.response?.status || null, lastError: errorData || err.message }));
+            
+            // Handle AI moderation errors specifically for comments
+            if (err.response?.status === 400 && errorData?.error === 'Content not allowed') {
+                const flaggedText = errorData.flaggedContent ? `"${errorData.flaggedContent}"` : 'certain content';
+                setLocalError && setLocalError(`⚠️ Your comment contains ${flaggedText} that violates our community guidelines. ${errorData.reason || 'Please revise and try again.'}`);
+            } else {
+                const errorMessage = errorData?.message || errorData?.error || "Could not post reply. Try again.";
+                setLocalError && setLocalError(errorMessage);
+            }
         }
     };
 

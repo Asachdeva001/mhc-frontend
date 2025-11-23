@@ -7,6 +7,7 @@ import { useAuth } from '@/lib/authContext';
 import { useRouter } from 'next/navigation';
 import Navigation from '@/components/Navigation';
 import JournalEditor from '@/components/JournalEditor';
+import { encryptionManager } from '@/lib/encryptionManager';
 
 export default function JournalPage() {
   const { user, loading: authLoading } = useAuth();
@@ -18,6 +19,7 @@ export default function JournalPage() {
   const [showEditor, setShowEditor] = useState(false);
   const [selectedEntry, setSelectedEntry] = useState(null);
   const [clickPosition, setClickPosition] = useState({ x: 0, y: 0 });
+  const [encryptionReady, setEncryptionReady] = useState(false);
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -26,10 +28,28 @@ export default function JournalPage() {
     }
   }, [user, authLoading, router]);
 
+  // Initialize encryption
+  useEffect(() => {
+    const initEncryption = async () => {
+      if (!user) return;
+      
+      try {
+        await encryptionManager.initializeForUser(user.uid);
+        setEncryptionReady(true);
+        console.log('🔐 Journal encryption ready');
+      } catch (error) {
+        console.error('❌ Failed to initialize journal encryption:', error);
+        setEncryptionReady(true); // Continue without encryption
+      }
+    };
+
+    initEncryption();
+  }, [user]);
+
   // Fetch journal entries
   useEffect(() => {
     const fetchEntries = async () => {
-      if (!user) return;
+      if (!user || !encryptionReady) return;
 
       try {
         const token = localStorage.getItem('mental_buddy_token');
@@ -57,7 +77,17 @@ export default function JournalPage() {
         }
 
         const data = await response.json();
-        setEntries(data.entries || []);
+        const fetchedEntries = data.entries || [];
+
+        // Decrypt entries if they are encrypted
+        try {
+          const decryptedEntries = await encryptionManager.decryptJournalEntries(fetchedEntries, user.uid);
+          setEntries(decryptedEntries);
+          console.log('✅ Journal entries decrypted:', decryptedEntries.length);
+        } catch (decryptError) {
+          console.warn('⚠️ Failed to decrypt some entries, using original data:', decryptError);
+          setEntries(fetchedEntries);
+        }
       } catch (err) {
         console.error('Fetch entries error:', err);
         setError(err.message);
@@ -67,7 +97,7 @@ export default function JournalPage() {
     };
 
     fetchEntries();
-  }, [user, router]);
+  }, [user, router, encryptionReady]);
 
   // Toggle favorite
   const toggleFavorite = async (entryId, currentStatus) => {

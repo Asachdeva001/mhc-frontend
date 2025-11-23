@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import ChatWindow from '../../components/ChatWindow';
 import Navigation from '../../components/Navigation';
+import DeepCheckIn from '../../components/DeepCheckIn';
 import { useAuth } from '../../lib/authContext';
 import { api } from '../../lib/api';
 import { chatStorage } from '../../lib/localStorage';
@@ -21,6 +22,9 @@ export default function ChatPage() {
   const [isInitializingEncryption, setIsInitializingEncryption] = useState(true);
   const [autoSpeakEnabled, setAutoSpeakEnabled] = useState(false);
   const [showMobileSidebar, setShowMobileSidebar] = useState(false);
+  
+  // Deep Check-In state (replaces bio-sensor)
+  const [showDeepCheckIn, setShowDeepCheckIn] = useState(false);
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -209,7 +213,8 @@ export default function ChatPage() {
         content: typeof msg.text === 'object' ? 'Encrypted message' : msg.text
       }));
 
-      const response = await api.generateResponse(messageText, apiMessages, null, user?.uid);
+      // Send message without bio-sense data (Deep Check-In sends its own multi-modal data)
+      const response = await api.generateResponse(messageText, apiMessages, null, user?.uid, null);
       
       const aiResponse = {
         text: response.reply,
@@ -261,6 +266,106 @@ export default function ChatPage() {
     }
   };
 
+  /**
+   * Handle Deep Check-In completion
+   * Sends the multi-modal transcript to the chatbot
+   */
+  const handleDeepCheckInComplete = async (transcript) => {
+    console.log('🎭 Deep Check-In completed:', transcript);
+    setShowDeepCheckIn(false);
+
+    if (!transcript || transcript.length === 0) {
+      console.log('No transcript data to process');
+      return;
+    }
+
+    // Format transcript for display
+    const summaryText = `I just completed a 1-minute deep check-in. Here's what I shared:`;
+    
+    // Add user message
+    const userMessage = {
+      text: summaryText,
+      sender: 'user',
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    };
+
+    const updatedMessages = [...messages, userMessage];
+    setMessages(updatedMessages);
+    
+    // Save user message
+    try {
+      const encryptedMessages = await messageEncryption.encryptMessages(updatedMessages, encryptionPassword);
+      chatStorage.saveMessages(user.uid, encryptedMessages);
+    } catch (error) {
+      console.warn('Failed to encrypt messages:', error);
+      chatStorage.saveMessages(user.uid, updatedMessages);
+    }
+    
+    setIsLoading(true);
+
+    try {
+      // Convert messages to API format
+      const apiMessages = messages.map(msg => ({
+        role: msg.sender === 'ai' ? 'assistant' : 'user',
+        content: typeof msg.text === 'object' ? 'Encrypted message' : msg.text
+      }));
+
+      // Send to AI with multi-modal data
+      const response = await api.generateResponse(
+        summaryText,
+        apiMessages,
+        null,
+        user?.uid,
+        null, // No single-point facial emotion
+        transcript // Multi-modal transcript data
+      );
+      
+      const aiResponse = {
+        text: response.reply,
+        sender: 'ai',
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        buttons: response.buttons || undefined
+      };
+
+      const finalMessages = [...updatedMessages, aiResponse];
+      setMessages(finalMessages);
+      
+      // Save conversation
+      try {
+        const encryptedFinalMessages = await messageEncryption.encryptMessages(finalMessages, encryptionPassword);
+        chatStorage.saveMessages(user.uid, encryptedFinalMessages);
+        await api.chat.saveConversation(encryptedFinalMessages, sessionId);
+      } catch (encryptError) {
+        console.warn('Failed to encrypt messages:', encryptError);
+        chatStorage.saveMessages(user.uid, finalMessages);
+        await api.chat.saveConversation(finalMessages, sessionId);
+      }
+    } catch (error) {
+      console.error('Error processing Deep Check-In:', error);
+      
+      const fallbackResponse = {
+        text: "I received your deep check-in, but I'm having trouble processing it right now. Please try again.",
+        sender: 'ai',
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      };
+
+      const finalMessages = [...updatedMessages, fallbackResponse];
+      setMessages(finalMessages);
+      
+      try {
+        const encryptedFallbackMessages = await messageEncryption.encryptMessages(finalMessages, encryptionPassword);
+        chatStorage.saveMessages(user.uid, encryptedFallbackMessages);
+        await api.chat.saveConversation(encryptedFallbackMessages, sessionId);
+      } catch (encryptError) {
+        console.warn('Failed to encrypt fallback messages:', encryptError);
+        chatStorage.saveMessages(user.uid, finalMessages);
+        await api.chat.saveConversation(finalMessages, sessionId);
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   if (loading || isInitializingEncryption) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center">
@@ -280,11 +385,41 @@ export default function ChatPage() {
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-emerald-50 via-slate-50 to-sky-50">
       <Navigation currentPage="chat" />
 
+      {/* Deep Check-In Modal */}
+      <DeepCheckIn 
+        isOpen={showDeepCheckIn}
+        onComplete={handleDeepCheckInComplete}
+        onCancel={() => setShowDeepCheckIn(false)}
+      />
+
       {/* Chat Interface */}
       <div className="flex-1 w-full mx-auto px-2 sm:px-4 md:px-6 py-2 sm:py-4">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 h-full max-w-7xl mx-auto relative">
           {/* Chat Window */}
-          <div className="lg:col-span-3 h-[calc(100vh-140px)] sm:h-[calc(100vh-130px)] lg:h-[calc(100vh-120px)]">
+          <div className="lg:col-span-3 h-[calc(100vh-140px)] sm:h-[calc(100vh-130px)] lg:h-[calc(100vh-120px)] relative">
+            {/* Deep Check-In Button - Positioned at top of chat */}
+            <div className="absolute top-3 right-3 z-10">
+              <button
+                onClick={() => setShowDeepCheckIn(true)}
+                className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-emerald-600 text-white rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-105"
+                title="Start 1-Minute Deep Check-In"
+              >
+                <svg 
+                  className="w-5 h-5" 
+                  fill="currentColor" 
+                  viewBox="0 0 20 20"
+                >
+                  <path fillRule="evenodd" d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 006 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z" clipRule="evenodd" />
+                </svg>
+                <span className="text-sm font-semibold hidden sm:inline">
+                  Deep Check-In (1 min)
+                </span>
+                <span className="text-sm font-semibold sm:hidden">
+                  Check-In
+                </span>
+              </button>
+            </div>
+
             <ChatWindow 
               messages={messages} 
               onSend={handleSend} 
